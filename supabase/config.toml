@@ -1,1 +1,8 @@
+
 project_id = "uoeshejtkzngnqxtqtbl"
+
+[functions.generate-whatsapp-code]
+verify_jwt = true
+
+[functions.unlink-whatsapp]
+verify_jwt = true
