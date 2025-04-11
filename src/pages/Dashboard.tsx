@@ -9,7 +9,7 @@ import {
   getCurrentUser,
   getUserProfile,
   generateWhatsappCode,
-  unlinkWhatsappCode,
+  unlinkWhatsapp,
 } from "@/lib/supabase";
 import {
   Check,
@@ -82,7 +82,7 @@ export default function Dashboard() {
 
   const handleUnlinkWhatsapp = async () => {
     try {
-      await unlinkWhatsappCode();
+      await unlinkWhatsapp();
       setProfile(prev => prev ? { ...prev, whatsapp_jid: null } : null);
       toast({
         title: "WhatsApp desconectado",
