@@ -6,6 +6,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Content-Type": "application/json"
 };
 
 // Handle preflight OPTIONS request
@@ -39,7 +40,7 @@ serve(async (req) => {
         JSON.stringify({ error: "User ID is required" }),
         { 
           status: 400, 
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
+          headers: corsHeaders
         }
       );
     }
@@ -56,7 +57,7 @@ serve(async (req) => {
         JSON.stringify({ error: "Failed to unlink WhatsApp" }),
         { 
           status: 500, 
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
+          headers: corsHeaders
         }
       );
     }
@@ -66,16 +67,16 @@ serve(async (req) => {
       JSON.stringify({ success: true }),
       { 
         status: 200, 
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
+        headers: corsHeaders
       }
     );
   } catch (error) {
     console.error("Unexpected error:", error);
     return new Response(
-      JSON.stringify({ error: "Internal server error" }),
+      JSON.stringify({ error: "Internal server error", details: error.message }),
       { 
         status: 500, 
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
+        headers: corsHeaders
       }
     );
   }
