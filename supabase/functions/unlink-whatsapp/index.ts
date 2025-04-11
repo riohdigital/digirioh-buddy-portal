@@ -54,7 +54,7 @@ serve(async (req) => {
     if (error) {
       console.error("Error unlinking WhatsApp:", error);
       return new Response(
-        JSON.stringify({ error: "Failed to unlink WhatsApp" }),
+        JSON.stringify({ error: "Failed to unlink WhatsApp", details: error.message }),
         { 
           status: 500, 
           headers: corsHeaders
@@ -62,9 +62,9 @@ serve(async (req) => {
       );
     }
     
-    // Return success
+    // Return success response as JSON
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ success: true, message: "WhatsApp unlinked successfully" }),
       { 
         status: 200, 
         headers: corsHeaders
