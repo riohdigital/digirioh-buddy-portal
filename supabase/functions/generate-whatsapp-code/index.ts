@@ -6,7 +6,6 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Content-Type": "application/json"
 };
 
 // Handle preflight OPTIONS request
@@ -40,7 +39,7 @@ serve(async (req) => {
         JSON.stringify({ error: "User ID is required" }),
         { 
           status: 400, 
-          headers: corsHeaders
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
         }
       );
     }
@@ -73,7 +72,7 @@ serve(async (req) => {
         JSON.stringify({ error: "Failed to generate WhatsApp code" }),
         { 
           status: 500, 
-          headers: corsHeaders
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
         }
       );
     }
@@ -83,16 +82,16 @@ serve(async (req) => {
       JSON.stringify({ code }),
       { 
         status: 200, 
-        headers: corsHeaders
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
       }
     );
   } catch (error) {
     console.error("Unexpected error:", error);
     return new Response(
-      JSON.stringify({ error: "Internal server error", details: error.message }),
+      JSON.stringify({ error: "Internal server error" }),
       { 
         status: 500, 
-        headers: corsHeaders
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
       }
     );
   }

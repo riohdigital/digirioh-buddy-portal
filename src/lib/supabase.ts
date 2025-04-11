@@ -30,6 +30,16 @@ export const getCurrentSession = async () => {
   return supabase.auth.getSession();
 };
 
+export const unlinkWhatsapp = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+  
+  return supabase
+    .from('profiles')
+    .update({ whatsapp_jid: null })
+    .eq('id', user.id);
+};
+
 export const getUserProfile = async () => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
@@ -47,58 +57,36 @@ export const generateWhatsappCode = async () => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
   
-  // Get the access token for the function call
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return null;
+  const response = await fetch('/api/generate-whatsapp-code', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ userId: user.id }),
+  });
   
-  try {
-    const response = await fetch(`${supabaseUrl}/functions/v1/generate-whatsapp-code`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify({ userId: user.id }),
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to generate WhatsApp code');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error generating WhatsApp code:', error);
-    throw error;
+  if (!response.ok) {
+    throw new Error('Failed to generate WhatsApp code');
   }
+  
+  return response.json();
 };
 
-export const unlinkWhatsapp = async () => {
+export const unlinkWhatsappCode = async () => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
   
-  // Get the access token for the function call
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return null;
+  const response = await fetch('/api/unlink-whatsapp', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ userId: user.id }),
+  });
   
-  try {
-    const response = await fetch(`${supabaseUrl}/functions/v1/unlink-whatsapp`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify({ userId: user.id }),
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Failed to unlink WhatsApp');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error unlinking WhatsApp:', error);
-    throw error;
+  if (!response.ok) {
+    throw new Error('Failed to unlink WhatsApp');
   }
+  
+  return response.json();
 };
