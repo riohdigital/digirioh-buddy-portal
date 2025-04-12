@@ -1,92 +1,161 @@
-
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '@/types/supabase';
+import { Database } from '@/types/supabase'; // Certifique-se que este tipo está correto
 
-// Use the correct Supabase URL and anon key
+// ----- Configuração do Cliente Supabase (MANTENHA COMO ESTÁ) -----
 const supabaseUrl = 'https://uoeshejtkzngnqxtqtbl.supabase.co';
+// ATENÇÃO: Esta é uma chave 'anon'. É seguro expô-la no frontend.
+// NUNCA exponha a chave 'service_role' no código do frontend.
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvZXNoZWp0a3puZ25xeHRxdGJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM1NTg3NDEsImV4cCI6MjA1OTEzNDc0MX0.URL7EMIL6dqMEJI33ZILQd3pO3AXKAB3zajBQQpx1kc';
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
+
+// ----- Funções de Autenticação (MANTENHA COMO ESTÃO) -----
 export const signInWithGoogle = async () => {
+  console.log("Iniciando login com Google...");
   return supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/dashboard`,
+      redirectTo: `${window.location.origin}/dashboard`, // Confirme se esta é a URL correta após o login
+      // Adicione ou remova escopos conforme necessário para sua aplicação
       scopes: 'https://mail.google.com/ https://www.googleapis.com/auth/calendar.events',
     },
   });
 };
 
 export const signOut = async () => {
+  console.log("Deslogando usuário...");
   return supabase.auth.signOut();
 };
 
 export const getCurrentUser = async () => {
+  console.log("Obtendo usuário atual...");
   return supabase.auth.getUser();
 };
 
 export const getCurrentSession = async () => {
+  console.log("Obtendo sessão atual...");
   return supabase.auth.getSession();
 };
 
-export const unlinkWhatsapp = async () => {
+
+// ----- Funções de Perfil de Usuário (MANTENHA COMO ESTÃO) -----
+export const getUserProfile = async () => {
+  console.log("Buscando perfil do usuário...");
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
-  
+  if (!user) {
+    console.log("Nenhum usuário logado para buscar perfil.");
+    return null;
+  }
+
+  try {
+    const { data: profile, error } = await supabase
+      .from('profiles') // Certifique-se que o nome da tabela está correto
+      .select('*')
+      .eq('id', user.id)
+      .single(); // .single() retorna erro se não encontrar ou encontrar mais de um
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 = 'Row not found' (não é um erro crítico aqui)
+        console.error("Erro ao buscar perfil:", error);
+        throw error; // Lança outros erros
+    }
+    console.log("Perfil encontrado:", profile);
+    return profile;
+  } catch(err) {
+      console.error("Exceção ao buscar perfil:", err);
+      return null; // Retorna null em caso de erro ou não encontrado
+  }
+};
+
+
+// ----- Função Original de Desconectar WhatsApp (Via DB - Mantenha por precaução) -----
+// Nota: Esta função atualiza a tabela 'profiles' diretamente.
+// O Dashboard.tsx usa a função 'unlinkWhatsappCode' abaixo, que chama a Edge Function.
+// Revise se esta função ainda é necessária ou se pode ser removida para evitar confusão.
+export const unlinkWhatsapp = async () => {
+  console.warn("Chamando função 'unlinkWhatsapp' (atualiza DB diretamente)...");
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    console.log("Nenhum usuário logado para desconectar WhatsApp (DB).");
+    return null;
+  }
+
   return supabase
-    .from('profiles')
-    .update({ whatsapp_jid: null })
+    .from('profiles') // Certifique-se que o nome da tabela está correto
+    .update({ whatsapp_jid: null }) // Confirme o nome da coluna
     .eq('id', user.id);
 };
 
-export const getUserProfile = async () => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
-  
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-  
-  return profile;
-};
 
+// ----- FUNÇÕES CORRIGIDAS PARA CHAMAR AS EDGE FUNCTIONS -----
+
+/**
+ * Chama a Edge Function 'generate-whatsapp-code' para obter um código de vinculação.
+ * Espera que a Edge Function retorne um JSON como: { code: "123456" } em caso de sucesso.
+ */
 export const generateWhatsappCode = async () => {
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
-  
-  const response = await fetch('/api/generate-whatsapp-code', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ userId: user.id }),
-  });
-  
-  if (!response.ok) {
-    throw new Error('Failed to generate WhatsApp code');
+  if (!user) {
+     console.error("generateWhatsappCode: Usuário não autenticado.");
+     // Lança um erro que pode ser capturado no componente que a chama
+     throw new Error("Usuário não autenticado. Faça login novamente.");
   }
-  
-  return response.json();
+
+  console.log(`Chamando Edge Function 'generate-whatsapp-code' para userId: ${user.id}`);
+
+  // Usa supabase.functions.invoke para chamar a Edge Function pelo nome
+  const { data, error } = await supabase.functions.invoke("generate-whatsapp-code", {
+    // O body é passado diretamente como um objeto JavaScript.
+    // O cliente Supabase cuida da serialização para JSON.
+    body: { userId: user.id },
+  });
+
+  // Verifica se houve erro na invocação da função
+  if (error) {
+    console.error("Erro ao invocar Edge Function 'generate-whatsapp-code':", error);
+    // Repassa o erro para ser tratado pelo componente que chamou a função
+    throw error;
+  }
+
+  console.log("Resposta recebida da Edge Function 'generate-whatsapp-code':", data);
+
+  // Adiciona uma verificação para garantir que a resposta contém o código esperado
+  if (!data || typeof data.code !== 'string') {
+      console.warn("Resposta da função 'generate-whatsapp-code' não contém a propriedade 'code' esperada:", data);
+      throw new Error("Resposta inválida do servidor ao gerar código.");
+  }
+
+  // Retorna os dados recebidos da Edge Function (que deve conter a propriedade 'code')
+  return data as { code: string }; // Adiciona um type assertion para clareza
 };
 
+/**
+ * Chama a Edge Function 'unlink-whatsapp' para desconectar o WhatsApp.
+ */
 export const unlinkWhatsappCode = async () => {
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
-  
-  const response = await fetch('/api/unlink-whatsapp', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ userId: user.id }),
+   if (!user) {
+     console.error("unlinkWhatsappCode: Usuário não autenticado.");
+     throw new Error("Usuário não autenticado. Faça login novamente.");
+   }
+
+  console.log(`Chamando Edge Function 'unlink-whatsapp' para userId: ${user.id}`);
+
+  // Usa supabase.functions.invoke para chamar a Edge Function pelo nome
+  const { data, error } = await supabase.functions.invoke("unlink-whatsapp", {
+    // Passa o userId no body.
+    // **Confirme se a sua Edge Function 'unlink-whatsapp/index.ts' espera receber { userId: '...' } no body.**
+    body: { userId: user.id },
   });
-  
-  if (!response.ok) {
-    throw new Error('Failed to unlink WhatsApp');
-  }
-  
-  return response.json();
+
+   // Verifica se houve erro na invocação da função
+   if (error) {
+    console.error("Erro ao invocar Edge Function 'unlink-whatsapp':", error);
+    // Repassa o erro para ser tratado pelo componente que chamou a função
+    throw error;
+   }
+
+  console.log("Resposta recebida da Edge Function 'unlink-whatsapp':", data);
+   // Retorna os dados recebidos da Edge Function (pode ser um objeto de sucesso, vazio, ou dados específicos)
+  return data;
 };
