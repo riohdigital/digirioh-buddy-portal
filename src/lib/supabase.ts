@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '@/types/supabase'; // Certifique-se que este tipo está correto
 
