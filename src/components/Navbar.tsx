@@ -2,21 +2,14 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { getCurrentUser, signOut } from "@/lib/supabase";
 import { MessageSquare } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, signOut } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data } = await getCurrentUser();
-      setIsLoggedIn(!!data.user);
-    };
-    
-    checkAuth();
-    
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
@@ -27,7 +20,6 @@ export function Navbar() {
 
   const handleSignOut = async () => {
     await signOut();
-    window.location.href = "/";
   };
 
   return (
@@ -41,7 +33,7 @@ export function Navbar() {
         </Link>
         
         <div className="flex items-center gap-4">
-          {!isLoggedIn ? (
+          {!user ? (
             <>
               <Link to="/features" className="text-digirioh-700 hover:text-digirioh-500">
                 Funcionalidades

@@ -1,15 +1,20 @@
-
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/Navbar";
-import { signInWithGoogle } from "@/lib/supabase";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   Calendar, Mail, Users, PenLine, Coins, 
   Clock, Globe, Calculator, MessageSquare 
 } from "lucide-react";
 
 export default function Index() {
+  const { signInWithGoogle } = useAuth();
+
   const handleGoogleSignIn = async () => {
-    await signInWithGoogle();
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      console.error("Erro ao fazer login com Google:", error);
+    }
   };
 
   return (

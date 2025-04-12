@@ -83,8 +83,10 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string | null
           avatar_url: string | null
           created_at: string
+          email: string | null
           first_name: string | null
           full_name: string | null
           google_email: string | null
@@ -92,12 +94,15 @@ export type Database = {
           google_refresh_token: string | null
           id: string
           last_name: string | null
+          phone: string | null
           updated_at: string
           whatsapp_jid: string | null
         }
         Insert: {
+          address?: string | null
           avatar_url?: string | null
           created_at?: string
+          email?: string | null
           first_name?: string | null
           full_name?: string | null
           google_email?: string | null
@@ -105,12 +110,15 @@ export type Database = {
           google_refresh_token?: string | null
           id: string
           last_name?: string | null
+          phone?: string | null
           updated_at?: string
           whatsapp_jid?: string | null
         }
         Update: {
+          address?: string | null
           avatar_url?: string | null
           created_at?: string
+          email?: string | null
           first_name?: string | null
           full_name?: string | null
           google_email?: string | null
@@ -118,6 +126,7 @@ export type Database = {
           google_refresh_token?: string | null
           id?: string
           last_name?: string | null
+          phone?: string | null
           updated_at?: string
           whatsapp_jid?: string | null
         }
@@ -227,34 +236,34 @@ export type Database = {
       }
       users: {
         Row: {
+          address: string | null
+          avatar_url: string | null
           created_at: string
-          default_latitude: number | null
-          default_longitude: number | null
-          morning_notification_enabled: boolean
-          morning_notification_time: string | null
-          preferred_name: string | null
-          pushname: string
-          user_jid: string
+          email: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
         }
         Insert: {
+          address?: string | null
+          avatar_url?: string | null
           created_at?: string
-          default_latitude?: number | null
-          default_longitude?: number | null
-          morning_notification_enabled?: boolean
-          morning_notification_time?: string | null
-          preferred_name?: string | null
-          pushname: string
-          user_jid: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string
         }
         Update: {
+          address?: string | null
+          avatar_url?: string | null
           created_at?: string
-          default_latitude?: number | null
-          default_longitude?: number | null
-          morning_notification_enabled?: boolean
-          morning_notification_time?: string | null
-          preferred_name?: string | null
-          pushname?: string
-          user_jid?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -271,7 +280,7 @@ export type Database = {
           created_at?: string
           expires_at: string
           id?: string
-          user_id?: string
+          user_id: string
         }
         Update: {
           code?: string
