@@ -1,7 +1,6 @@
-
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { supabase, signInWithGoogle as signInWithGoogleFromLib } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
@@ -21,7 +20,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Configurar listener para mudanças de estado de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
         console.log("Auth state changed:", event, currentSession?.user?.id);
@@ -38,7 +36,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     );
 
-    // Verificar sessão existente
     const checkSession = async () => {
       const { data: { session: currentSession } } = await supabase.auth.getSession();
       setSession(currentSession);
@@ -52,7 +49,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     checkSession();
 
-    // Limpar subscription quando componente for desmontado
     return () => {
       subscription.unsubscribe();
     };
@@ -60,16 +56,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const handleSignInWithGoogle = async () => {
     try {
-      console.log("Iniciando login com Google do hook...");
-      await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-          scopes: 'https://mail.google.com/ https://www.googleapis.com/auth/calendar.events',
-        },
-      });
+      console.log("Chamando signInWithGoogle de lib/supabase...");
+      await signInWithGoogleFromLib();
     } catch (error) {
-      console.error("Erro no login com Google:", error);
+      console.error("Erro ao iniciar o fluxo de login com Google:", error);
     }
   };
 
