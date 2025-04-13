@@ -20,12 +20,12 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 
 // ----- Funções de Autenticação (ATUALIZADAS) -----
 export const signInWithGoogle = async () => {
-  console.log("Redirecionando para:", `${window.location.origin}/auth-callback`); // Adicione esta linha
   console.log("Iniciando login com Google...");
+  console.log("Chamando supabase.auth.signInWithOAuth...");  // Adicionado
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/auth-callback`, // Modificado para usar página de callback com #
+      redirectTo: `${window.location.origin}/auth-callback`,
       scopes: 'https://mail.google.com/ https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
       queryParams: {
         access_type: 'offline',
@@ -33,6 +33,8 @@ export const signInWithGoogle = async () => {
       }
     },
   });
+  console.log("Retornou de supabase.auth.signInWithOAuth. data:", data, "error:", error); // Adicionado
+  console.log("Redirecionando para:", `${window.location.origin}/auth-callback`);
   
   if (error) {
     console.error("Erro no login com Google:", error.message);
