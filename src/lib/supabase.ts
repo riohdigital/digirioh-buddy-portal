@@ -20,6 +20,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 
 // ----- Funções de Autenticação (ATUALIZADAS) -----
 export const signInWithGoogle = async () => {
+  console.log("Redirecionando para:", `${window.location.origin}/auth-callback`); // Adicione esta linha
   console.log("Iniciando login com Google...");
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
