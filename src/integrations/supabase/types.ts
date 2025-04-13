@@ -58,9 +58,11 @@ export type Database = {
         Row: {
           avatar_url: string | null
           full_name: string | null
+          google_access_token: string | null
           google_email: string | null
           google_id: string | null
           google_refresh_token: string | null
+          google_token_expires_at: string | null
           id: string
           plan: string
           role: string
@@ -70,9 +72,11 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           full_name?: string | null
+          google_access_token?: string | null
           google_email?: string | null
           google_id?: string | null
           google_refresh_token?: string | null
+          google_token_expires_at?: string | null
           id: string
           plan?: string
           role?: string
@@ -82,9 +86,11 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           full_name?: string | null
+          google_access_token?: string | null
           google_email?: string | null
           google_id?: string | null
           google_refresh_token?: string | null
+          google_token_expires_at?: string | null
           id?: string
           plan?: string
           role?: string
