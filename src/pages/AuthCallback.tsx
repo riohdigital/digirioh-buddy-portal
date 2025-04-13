@@ -64,6 +64,7 @@ export default function AuthCallback() {
         setTimeout(() => navigate("/dashboard"), 1000); // Redireciona para o dashboard
 
       } catch (error: any) { // Especifica 'any' ou um tipo mais específico para error
+        console.error("AuthCallback: Error in handleAuthCallback:", error); // Adicionado para detalhar erros
         console.error("Erro no processo de callback:", error);
         toast({
           title: "Erro de autenticação",
