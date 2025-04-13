@@ -1,11 +1,8 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '@/types/supabase'; // Certifique-se que este tipo está correto
 
 // ----- Configuração do Cliente Supabase (MANTENHA COMO ESTÁ) -----
 const supabaseUrl = 'https://uoeshejtkzngnqxtqtbl.supabase.co';
-// ATENÇÃO: Esta é uma chave 'anon'. É seguro expô-la no frontend.
-// NUNCA exponha a chave 'service_role' no código do frontend.
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvZXNoZWp0a3puZ25xeHRxdGJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM1NTg3NDEsImV4cCI6MjA1OTEzNDc0MX0.URL7EMIL6dqMEJI33ZILQd3pO3AXKAB3zajBQQpx1kc';
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
@@ -13,51 +10,96 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     storage: localStorage,
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true,
+    detectSessionInUrl: true, // Mantém true para ler tokens do hash
   },
 });
 
 
-// ----- Funções de Autenticação (ATUALIZADAS) -----
+// ----- Funções de Autenticação -----
+
+// ** 1. FUNÇÃO signInWithGoogle MODIFICADA **
 export const signInWithGoogle = async () => {
-  console.log("Iniciando login com Google...");
-  console.log("Chamando supabase.auth.signInWithOAuth...");  // Adicionado
+  console.log("Iniciando login com Google (Fluxo Padrão Supabase)...");
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/auth-callback`,
+      // Redireciona para o dashboard onde onAuthStateChange irá capturar a sessão
+      redirectTo: `${window.location.origin}/dashboard`, // <<< CORRIGIDO
+      // Mantém os escopos necessários
       scopes: 'https://mail.google.com/ https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
-      queryParams: {
+      // Mantém queryParams para solicitar refresh token
+      queryParams: { // <<< MANTIDO
         access_type: 'offline',
         prompt: 'consent',
       }
     },
   });
-  console.log("Retornou de supabase.auth.signInWithOAuth. data:", data, "error:", error); // Adicionado
-  console.log("Redirecionando para:", `${window.location.origin}/auth-callback`);
-  
+
   if (error) {
     console.error("Erro no login com Google:", error.message);
     throw error;
   }
-  
-  console.log("Login com Google iniciado, redirecionando...", data);
-  return data;
+
+  console.log("Login com Google iniciado, redirecionamento para Google...", data?.url);
+  // Não retorna 'data' aqui, o redirecionamento acontece no navegador
 };
 
+// Função signOut (sem alterações)
 export const signOut = async () => {
   console.log("Deslogando usuário...");
   return supabase.auth.signOut();
 };
 
+// Função getCurrentUser (sem alterações)
 export const getCurrentUser = async () => {
   console.log("Obtendo usuário atual...");
   return supabase.auth.getUser();
 };
 
+// Função getCurrentSession (sem alterações)
 export const getCurrentSession = async () => {
   console.log("Obtendo sessão atual...");
   return supabase.auth.getSession();
+};
+
+// ** 2. FUNÇÃO saveGoogleTokens ADICIONADA/CONFIRMADA **
+export const saveGoogleTokens = async (tokens: { accessToken: string; refreshToken: string | null }) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    console.error("saveGoogleTokens: Usuário não autenticado.");
+    throw new Error("Usuário não autenticado para salvar tokens.");
+  }
+
+  // Verifica se há tokens válidos para enviar
+  if (!tokens.accessToken) {
+    console.warn("saveGoogleTokens: Access token ausente, não chamando a Edge Function.");
+    return { success: false, message: "Access token ausente."};
+  }
+
+  console.log(`Chamando Edge Function 'save-google-tokens' para userId: ${user.id}`);
+  console.log(` - Access Token: ${tokens.accessToken ? 'Presente' : 'Ausente'}`);
+  console.log(` - Refresh Token: ${tokens.refreshToken ? 'Presente' : 'Ausente'}`);
+
+  try {
+    // Chama a Edge Function que deve existir no Supabase
+    const { data, error } = await supabase.functions.invoke("save-google-tokens", {
+      body: {
+        userId: user.id,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken, // Envia null se não existir
+      },
+    });
+
+    if (error) {
+      console.error("Erro ao invocar 'save-google-tokens':", error);
+      throw error; // Repassa o erro
+    }
+    console.log("Resposta da Edge Function 'save-google-tokens':", data);
+    return data; // Retorna a resposta da função (ex: { success: true })
+  } catch (invocationError) {
+    console.error("saveGoogleTokens: Exceção ao invocar Edge Function:", invocationError);
+    throw invocationError; // Re-throw
+  }
 };
 
 // ----- Funções de Perfil de Usuário (MANTENHA COMO ESTÃO) -----
