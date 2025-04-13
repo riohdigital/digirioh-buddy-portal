@@ -9,33 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      digirioh_app_google_user_tokens: {
-        Row: {
-          created_at: string
-          google_email: string | null
-          google_id: string
-          google_refresh_token: string | null
-          id: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          google_email?: string | null
-          google_id: string
-          google_refresh_token?: string | null
-          id?: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          google_email?: string | null
-          google_id?: string
-          google_refresh_token?: string | null
-          id?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
       digirioh_app_whatsapp_chat_history: {
         Row: {
           id: number
@@ -83,51 +56,39 @@ export type Database = {
       }
       profiles: {
         Row: {
-          address: string | null
           avatar_url: string | null
-          created_at: string
-          email: string | null
-          first_name: string | null
           full_name: string | null
           google_email: string | null
           google_id: string | null
           google_refresh_token: string | null
           id: string
-          last_name: string | null
-          phone: string | null
-          updated_at: string
+          plan: string
+          role: string
+          updated_at: string | null
           whatsapp_jid: string | null
         }
         Insert: {
-          address?: string | null
           avatar_url?: string | null
-          created_at?: string
-          email?: string | null
-          first_name?: string | null
           full_name?: string | null
           google_email?: string | null
           google_id?: string | null
           google_refresh_token?: string | null
           id: string
-          last_name?: string | null
-          phone?: string | null
-          updated_at?: string
+          plan?: string
+          role?: string
+          updated_at?: string | null
           whatsapp_jid?: string | null
         }
         Update: {
-          address?: string | null
           avatar_url?: string | null
-          created_at?: string
-          email?: string | null
-          first_name?: string | null
           full_name?: string | null
           google_email?: string | null
           google_id?: string | null
           google_refresh_token?: string | null
           id?: string
-          last_name?: string | null
-          phone?: string | null
-          updated_at?: string
+          plan?: string
+          role?: string
+          updated_at?: string | null
           whatsapp_jid?: string | null
         }
         Relationships: []
@@ -234,39 +195,6 @@ export type Database = {
         }
         Relationships: []
       }
-      users: {
-        Row: {
-          address: string | null
-          avatar_url: string | null
-          created_at: string
-          email: string | null
-          full_name: string | null
-          id: string
-          phone: string | null
-          updated_at: string
-        }
-        Insert: {
-          address?: string | null
-          avatar_url?: string | null
-          created_at?: string
-          email?: string | null
-          full_name?: string | null
-          id: string
-          phone?: string | null
-          updated_at?: string
-        }
-        Update: {
-          address?: string | null
-          avatar_url?: string | null
-          created_at?: string
-          email?: string | null
-          full_name?: string | null
-          id?: string
-          phone?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
       whatsapp_linking_codes: {
         Row: {
           code: string
@@ -296,7 +224,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      insert_user_to_profiles: {
+        Args: { user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

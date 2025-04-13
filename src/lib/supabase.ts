@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '@/types/supabase'; // Certifique-se que este tipo está correto
 
@@ -24,8 +23,12 @@ export const signInWithGoogle = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/dashboard`, // URL de redirecionamento após login
-      scopes: 'https://mail.google.com/ https://www.googleapis.com/auth/calendar.events',
+      redirectTo: `${window.location.origin}/auth-callback`, // Modificado para usar página de callback
+      scopes: 'https://mail.google.com/ https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      }
     },
   });
   
@@ -84,9 +87,6 @@ export const getUserProfile = async () => {
 
 
 // ----- Função Original de Desconectar WhatsApp (Via DB - Mantenha por precaução) -----
-// Nota: Esta função atualiza a tabela 'profiles' diretamente.
-// O Dashboard.tsx usa a função 'unlinkWhatsappCode' abaixo, que chama a Edge Function.
-// Revise se esta função ainda é necessária ou se pode ser removida para evitar confusão.
 export const unlinkWhatsappCode = async () => {
   console.warn("Chamando função 'unlinkWhatsapp' (atualiza DB diretamente)...");
   const { data: { user } } = await supabase.auth.getUser();
@@ -112,36 +112,28 @@ export const generateWhatsappCode = async () => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
      console.error("generateWhatsappCode: Usuário não autenticado.");
-     // Lança um erro que pode ser capturado no componente que a chama
      throw new Error("Usuário não autenticado. Faça login novamente.");
   }
 
   console.log(`Chamando Edge Function 'generate-whatsapp-code' para userId: ${user.id}`);
 
-  // Usa supabase.functions.invoke para chamar a Edge Function pelo nome
   const { data, error } = await supabase.functions.invoke("generate-whatsapp-code", {
-    // O body é passado diretamente como um objeto JavaScript.
-    // O cliente Supabase cuida da serialização para JSON.
     body: { userId: user.id },
   });
 
-  // Verifica se houve erro na invocação da função
   if (error) {
     console.error("Erro ao invocar Edge Function 'generate-whatsapp-code':", error);
-    // Repassa o erro para ser tratado pelo componente que chamou a função
     throw error;
   }
 
   console.log("Resposta recebida da Edge Function 'generate-whatsapp-code':", data);
 
-  // Adiciona uma verificação para garantir que a resposta contém o código esperado
   if (!data || typeof data.code !== 'string') {
       console.warn("Resposta da função 'generate-whatsapp-code' não contém a propriedade 'code' esperada:", data);
       throw new Error("Resposta inválida do servidor ao gerar código.");
   }
 
-  // Retorna os dados recebidos da Edge Function (que deve conter a propriedade 'code')
-  return data as { code: string }; // Adiciona um type assertion para clareza
+  return data as { code: string };
 };
 
 /**
@@ -156,19 +148,46 @@ export const unlinkWhatsapp = async () => {
 
   console.log(`Chamando Edge Function 'unlink-whatsapp' para userId: ${user.id}`);
 
-  // Usa supabase.functions.invoke para chamar a Edge Function pelo nome
   const { data, error } = await supabase.functions.invoke("unlink-whatsapp", {
-    // Passa o userId no body.
     body: { userId: user.id },
   });
 
-   // Verifica se houve erro na invocação da função
    if (error) {
     console.error("Erro ao invocar Edge Function 'unlink-whatsapp':", error);
-    // Repassa o erro para ser tratado pelo componente que chamou a função
     throw error;
    }
 
   console.log("Resposta recebida da Edge Function 'unlink-whatsapp':", data);
+  return data;
+};
+
+/**
+ * Chama a Edge Function 'auth-google-exchange' para trocar o código de autorização
+ * por tokens de acesso e refresh, armazenando o refresh token no banco de dados.
+ */
+export const exchangeGoogleAuthCode = async (code: string) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    console.error("exchangeGoogleAuthCode: Usuário não autenticado.");
+    throw new Error("Usuário não autenticado. Faça login novamente.");
+  }
+
+  console.log(`Chamando Edge Function 'auth-google-exchange' para código: ${code.substring(0, 10)}...`);
+
+  const redirectUrl = `${window.location.origin}/auth-callback`;
+  
+  const { data, error } = await supabase.functions.invoke("auth-google-exchange", {
+    body: { 
+      code,
+      redirectUrl
+    },
+  });
+
+  if (error) {
+    console.error("Erro ao invocar Edge Function 'auth-google-exchange':", error);
+    throw error;
+  }
+
+  console.log("Resposta recebida da Edge Function 'auth-google-exchange':", data);
   return data;
 };
