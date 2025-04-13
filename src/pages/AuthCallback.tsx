@@ -11,13 +11,16 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const handleAuthCallback = async () => {
+      console.log("AuthCallback: useEffect triggered."); // Adicionado
+      console.log("AuthCallback: window.location.hash:", window.location.hash); // Adicionado
       try {
-        // ----- INÍCIO DA MODIFICAÇÃO -----
-        // Parse parameters from the URL fragment (#) instead of search params (?)
-        const hashParams = new URLSearchParams(window.location.hash.substring(1)); // Remove the leading '#'
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const code = hashParams.get("code");
-        const errorParam = hashParams.get("error"); // Renomeado para evitar conflito com a variável 'error' do try-catch
+        const errorParam = hashParams.get("error");
         const errorDescription = hashParams.get("error_description");
+
+        console.log("AuthCallback: Parsed code:", code); // Adicionado
+        console.log("AuthCallback: Parsed errorParam:", errorParam); // Adicionado
 
         // Verifica se houve um erro retornado pelo Google no hash
         if (errorParam) {
@@ -46,9 +49,11 @@ export default function AuthCallback() {
         }
         // ----- FIM DA MODIFICAÇÃO -----
 
-        // Troca o código de autorização por tokens via Edge Function (sem alterações aqui)
-        const result = await exchangeGoogleAuthCode(code);
-        console.log("Autenticação completa:", result);
+        if (code) {
+           console.log("AuthCallback: Calling exchangeGoogleAuthCode with code:", code.substring(0, 10) + "..."); // Adicionado
+           const result = await exchangeGoogleAuthCode(code);
+           console.log("AuthCallback: Result from exchangeGoogleAuthCode:", result); // Adicionado
+        }
 
         toast({
           title: "Autenticação bem-sucedida",
