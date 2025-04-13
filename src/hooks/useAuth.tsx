@@ -1,7 +1,7 @@
 
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { supabase, saveGoogleTokens } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
@@ -23,10 +23,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Configurar listener para mudanças de estado de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, currentSession) => {
+      async (event, currentSession) => {
         console.log("Auth state changed:", event, currentSession?.user?.id);
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
+        
+        // Verifica se deve salvar tokens do Google após login ou refresh de token
+        if (currentSession?.provider_token && currentSession?.user && 
+            (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+          try {
+            console.log('AuthProvider: Tentando salvar tokens do Google para user:', currentSession.user.id);
+            await saveGoogleTokens({ 
+              accessToken: currentSession.provider_token, 
+              refreshToken: currentSession.provider_refresh_token || null 
+            });
+            console.log('AuthProvider: Tokens do Google salvos com sucesso (ou tentativa enviada).');
+          } catch (error) {
+            console.error('AuthProvider: Erro ao tentar salvar tokens do Google:', error);
+          }
+        }
         
         if (event === 'SIGNED_IN' && currentSession) {
           console.log("Usuário autenticado, redirecionando para dashboard");

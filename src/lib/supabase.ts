@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '@/types/supabase'; // Certifique-se que este tipo está correto
 
@@ -56,6 +57,44 @@ export const getCurrentSession = async () => {
   return supabase.auth.getSession();
 };
 
+// ----- Nova função para salvar tokens do Google -----
+export const saveGoogleTokens = async ({ 
+  accessToken, 
+  refreshToken 
+}: { 
+  accessToken: string; 
+  refreshToken: string | null;
+}) => {
+  console.log("Iniciando salvamento dos tokens do Google...");
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      console.error("Nenhum usuário autenticado para salvar tokens.");
+      throw new Error("Usuário não autenticado");
+    }
+    
+    // Chamar Edge Function para salvar os tokens de forma segura
+    const { data, error } = await supabase.functions.invoke("save-google-tokens", {
+      body: { 
+        userId: user.id,
+        accessToken,
+        refreshToken
+      },
+    });
+
+    if (error) {
+      console.error("Erro ao chamar Edge Function 'save-google-tokens':", error);
+      throw error;
+    }
+
+    console.log("Tokens do Google salvos com sucesso:", data);
+    return data;
+  } catch (error) {
+    console.error("Erro ao salvar tokens do Google:", error);
+    throw error;
+  }
+};
 
 // ----- Funções de Perfil de Usuário (MANTENHA COMO ESTÃO) -----
 export const getUserProfile = async () => {
