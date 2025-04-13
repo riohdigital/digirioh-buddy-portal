@@ -24,7 +24,7 @@ export const signInWithGoogle = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/auth-callback`, // Modificado para usar página de callback
+      redirectTo: `${window.location.origin}/auth-callback#`, // Modificado para usar página de callback com #
       scopes: 'https://mail.google.com/ https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
       queryParams: {
         access_type: 'offline',
