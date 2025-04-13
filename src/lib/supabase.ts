@@ -172,6 +172,7 @@ export const exchangeGoogleAuthCode = async (code: string) => {
     throw new Error("Usuário não autenticado. Faça login novamente.");
   }
 
+  console.log("exchangeGoogleAuthCode: User object:", user);
   console.log(`Chamando Edge Function 'auth-google-exchange' para código: ${code.substring(0, 10)}...`);
 
   const redirectUrl = `${window.location.origin}/auth-callback`;
