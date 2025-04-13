@@ -167,6 +167,7 @@ export const unlinkWhatsapp = async () => {
  */
 export const exchangeGoogleAuthCode = async (code: string) => {
   const { data: { user } } = await supabase.auth.getUser();
+  console.log("Objeto user:", user); // Adicione esta linha
   if (!user) {
     console.error("exchangeGoogleAuthCode: Usuário não autenticado.");
     throw new Error("Usuário não autenticado. Faça login novamente.");
