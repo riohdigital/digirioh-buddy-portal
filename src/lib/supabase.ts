@@ -1,8 +1,11 @@
+
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '@/types/supabase'; // Certifique-se que este tipo está correto
 
-// ----- Configuração do Cliente Supabase -----
+// ----- Configuração do Cliente Supabase (MANTENHA COMO ESTÁ) -----
 const supabaseUrl = 'https://uoeshejtkzngnqxtqtbl.supabase.co';
+// ATENÇÃO: Esta é uma chave 'anon'. É seguro expô-la no frontend.
+// NUNCA exponha a chave 'service_role' no código do frontend.
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvZXNoZWp0a3puZ25xeHRxdGJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM1NTg3NDEsImV4cCI6MjA1OTEzNDc0MX0.URL7EMIL6dqMEJI33ZILQd3pO3AXKAB3zajBQQpx1kc';
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
@@ -10,72 +13,54 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     storage: localStorage,
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true, // Mantido como true
+    detectSessionInUrl: true,
   },
 });
 
 
 // ----- Funções de Autenticação (ATUALIZADAS) -----
-
-/**
- * Inicia o fluxo de login com o Google, solicitando acesso offline
- * para obter o refresh token e redirecionando para o dashboard.
- * (MODIFICADA NESTA ATUALIZAÇÃO)
- */
 export const signInWithGoogle = async () => {
-  console.log("Iniciando login com Google (com solicitação de refresh token)...");
+  console.log("Iniciando login com Google...");
+  console.log("Chamando supabase.auth.signInWithOAuth...");  // Adicionado
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      // Redireciona para a página principal após login bem-sucedido
-      redirectTo: `${window.location.origin}/dashboard`,
-      // Solicita o refresh token e a tela de consentimento
+      redirectTo: `${window.location.origin}/auth-callback`,
+      scopes: 'https://mail.google.com/ https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
       queryParams: {
         access_type: 'offline',
         prompt: 'consent',
-      },
-      // Defina os escopos necessários
-      scopes: 'https://mail.google.com/ https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
+      }
     },
   });
-
+  console.log("Retornou de supabase.auth.signInWithOAuth. data:", data, "error:", error); // Adicionado
+  console.log("Redirecionando para:", `${window.location.origin}/auth-callback`);
+  
   if (error) {
     console.error("Erro no login com Google:", error.message);
     throw error;
   }
-
-  console.log("Redirecionamento para o Google iniciado...");
+  
+  console.log("Login com Google iniciado, redirecionando...", data);
   return data;
 };
 
-/**
- * Desloga o usuário atual.
- * (MANTIDA)
- */
 export const signOut = async () => {
   console.log("Deslogando usuário...");
   return supabase.auth.signOut();
 };
 
-/**
- * Obtém o usuário atualmente logado.
- * (MANTIDA)
- */
 export const getCurrentUser = async () => {
   console.log("Obtendo usuário atual...");
   return supabase.auth.getUser();
 };
 
-/**
- * Obtém a sessão atual do usuário.
- * (MANTIDA)
- */
 export const getCurrentSession = async () => {
   console.log("Obtendo sessão atual...");
   return supabase.auth.getSession();
 };
 
-// ----- Funções de Perfil de Usuário (MANTIDAS) -----
+// ----- Funções de Perfil de Usuário (MANTENHA COMO ESTÃO) -----
 export const getUserProfile = async () => {
   console.log("Buscando perfil do usuário...");
   const { data: { user } } = await supabase.auth.getUser();
@@ -89,26 +74,42 @@ export const getUserProfile = async () => {
       .from('profiles') // Certifique-se que o nome da tabela está correto
       .select('*')
       .eq('id', user.id)
-      .single();
+      .single(); // .single() retorna erro se não encontrar ou encontrar mais de um
 
-    if (error && error.code !== 'PGRST116') { // Ignora 'Row not found'
+    if (error && error.code !== 'PGRST116') { // PGRST116 = 'Row not found' (não é um erro crítico aqui)
         console.error("Erro ao buscar perfil:", error);
-        throw error;
+        throw error; // Lança outros erros
     }
     console.log("Perfil encontrado:", profile);
     return profile;
   } catch(err) {
       console.error("Exceção ao buscar perfil:", err);
-      return null;
+      return null; // Retorna null em caso de erro ou não encontrado
   }
 };
 
 
-// ----- Funções do WhatsApp (MANTIDAS) -----
+// ----- Função Original de Desconectar WhatsApp (Via DB - Mantenha por precaução) -----
+export const unlinkWhatsappCode = async () => {
+  console.warn("Chamando função 'unlinkWhatsapp' (atualiza DB diretamente)...");
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    console.log("Nenhum usuário logado para desconectar WhatsApp (DB).");
+    return null;
+  }
+
+  return supabase
+    .from('profiles') // Certifique-se que o nome da tabela está correto
+    .update({ whatsapp_jid: null }) // Confirme o nome da coluna
+    .eq('id', user.id);
+};
+
+
+// ----- FUNÇÕES CORRIGIDAS PARA CHAMAR AS EDGE FUNCTIONS -----
 
 /**
  * Chama a Edge Function 'generate-whatsapp-code' para obter um código de vinculação.
- * (MANTIDA)
+ * Espera que a Edge Function retorne um JSON como: { code: "123456" } em caso de sucesso.
  */
 export const generateWhatsappCode = async () => {
   const { data: { user } } = await supabase.auth.getUser();
@@ -120,7 +121,7 @@ export const generateWhatsappCode = async () => {
   console.log(`Chamando Edge Function 'generate-whatsapp-code' para userId: ${user.id}`);
 
   const { data, error } = await supabase.functions.invoke("generate-whatsapp-code", {
-    body: { userId: user.id }, // Supabase JS v2+ não precisa de JSON.stringify aqui
+    body: { userId: user.id },
   });
 
   if (error) {
@@ -130,7 +131,6 @@ export const generateWhatsappCode = async () => {
 
   console.log("Resposta recebida da Edge Function 'generate-whatsapp-code':", data);
 
-  // Adicionada verificação mais robusta da resposta
   if (!data || typeof data.code !== 'string') {
       console.warn("Resposta da função 'generate-whatsapp-code' não contém a propriedade 'code' esperada:", data);
       throw new Error("Resposta inválida do servidor ao gerar código.");
@@ -141,7 +141,6 @@ export const generateWhatsappCode = async () => {
 
 /**
  * Chama a Edge Function 'unlink-whatsapp' para desconectar o WhatsApp.
- * (MANTIDA)
  */
 export const unlinkWhatsapp = async () => {
   const { data: { user } } = await supabase.auth.getUser();
@@ -153,7 +152,7 @@ export const unlinkWhatsapp = async () => {
   console.log(`Chamando Edge Function 'unlink-whatsapp' para userId: ${user.id}`);
 
   const { data, error } = await supabase.functions.invoke("unlink-whatsapp", {
-    body: { userId: user.id }, // Supabase JS v2+ não precisa de JSON.stringify aqui
+    body: { userId: user.id },
   });
 
    if (error) {
@@ -165,50 +164,35 @@ export const unlinkWhatsapp = async () => {
   return data;
 };
 
-// ----- FUNÇÃO PARA CHAMAR A EDGE FUNCTION DE SALVAR TOKENS (ADICIONADA) -----
-
 /**
- * Invoca a Edge Function 'save-google-tokens' para armazenar
- * o access token e o refresh token no banco de dados.
- * (ADICIONADA NESTA ATUALIZAÇÃO)
+ * Chama a Edge Function 'auth-google-exchange' para trocar o código de autorização
+ * por tokens de acesso e refresh, armazenando o refresh token no banco de dados.
  */
-export const saveGoogleTokens = async (userId: string, accessToken: string | null, refreshToken: string | null) => {
-  // Verifica se os tokens essenciais estão presentes
-  if (!userId || !accessToken || !refreshToken) {
-      console.error('saveGoogleTokens: Faltam dados essenciais (userId, accessToken, refreshToken).', { userId, hasAccessToken: !!accessToken, hasRefreshToken: !!refreshToken });
-      return; // Retorna para não quebrar o fluxo
+export const exchangeGoogleAuthCode = async (code: string) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  console.log("Objeto user:", user); // Adicione esta linha
+  if (!user) {
+    console.error("exchangeGoogleAuthCode: Usuário não autenticado.");
+    throw new Error("Usuário não autenticado. Faça login novamente.");
   }
 
-  console.log(`Chamando Edge Function save-google-tokens para userId: ${userId}...`);
-  try {
-    // Importante: Se usar Supabase JS v1.x, pode precisar de JSON.stringify. V2+ lida com isso.
-    const { data, error } = await supabase.functions.invoke('save-google-tokens', {
-      body: { userId, accessToken, refreshToken },
-    });
+  console.log("exchangeGoogleAuthCode: User object:", user);
+  console.log(`Chamando Edge Function 'auth-google-exchange' para código: ${code.substring(0, 10)}...`);
 
-    if (error) {
-      console.error('Erro ao chamar Edge Function save-google-tokens:', error);
-      let errorMessage = error.message;
-      // Tenta obter detalhes do erro do contexto da resposta da função
-      if (error.context && error.context.status) {
-          errorMessage = `HTTP ${error.context.status}: ${error.message}`;
-          // Tentar ler o corpo da resposta se for JSON
-          try {
-              const errorBody = await error.context.json();
-              errorMessage = errorBody.error || errorBody.details || errorMessage;
-          } catch (_) { /* Ignora erro ao parsear json */ }
-      }
-      throw new Error(`Erro da Edge Function: ${errorMessage}`);
-    }
+  const redirectUrl = `${window.location.origin}/auth-callback`;
+  
+  const { data, error } = await supabase.functions.invoke("auth-google-exchange", {
+    body: { 
+      code,
+      redirectUrl
+    },
+  });
 
-    console.log('Edge Function save-google-tokens executada com sucesso:', data);
-    return data;
-  } catch (err: any) { // Captura qualquer erro
-    console.error('Erro inesperado ao salvar tokens:', err);
-    throw err; // Re-lança o erro para ser tratado no useAuth
+  if (error) {
+    console.error("Erro ao invocar Edge Function 'auth-google-exchange':", error);
+    throw error;
   }
+
+  console.log("Resposta recebida da Edge Function 'auth-google-exchange':", data);
+  return data;
 };
-
-// ----- FUNÇÃO REMOVIDA -----
-// A função exchangeGoogleAuthCode foi removida pois não é mais necessária neste fluxo.
-
