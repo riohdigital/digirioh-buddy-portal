@@ -11,6 +11,7 @@ export default function Index() {
   const { signInWithGoogle } = useAuth();
 
   const handleGoogleSignIn = async () => {
+    console.log("Botão 'Conectar com Google' clicado"); // Adicione esta linha
     try {
       await signInWithGoogle();
     } catch (error) {
