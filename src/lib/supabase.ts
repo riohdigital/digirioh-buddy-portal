@@ -1,4 +1,3 @@
-\
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '@/types/supabase'; // Certifique-se que este tipo está correto
 
@@ -121,7 +120,7 @@ export const generateWhatsappCode = async () => {
   console.log(`Chamando Edge Function 'generate-whatsapp-code' para userId: ${user.id}`);
 
   const { data, error } = await supabase.functions.invoke("generate-whatsapp-code", {
-    body: { userId: user.id },
+    body: { userId: user.id }, // Supabase JS v2+ não precisa de JSON.stringify aqui
   });
 
   if (error) {
@@ -154,7 +153,7 @@ export const unlinkWhatsapp = async () => {
   console.log(`Chamando Edge Function 'unlink-whatsapp' para userId: ${user.id}`);
 
   const { data, error } = await supabase.functions.invoke("unlink-whatsapp", {
-    body: { userId: user.id },
+    body: { userId: user.id }, // Supabase JS v2+ não precisa de JSON.stringify aqui
   });
 
    if (error) {
@@ -182,22 +181,22 @@ export const saveGoogleTokens = async (userId: string, accessToken: string | nul
 
   console.log(`Chamando Edge Function save-google-tokens para userId: ${userId}...`);
   try {
-    // Importante: O Supabase JS v5+ espera que o body seja serializado manualmente para invoke
+    // Importante: Se usar Supabase JS v1.x, pode precisar de JSON.stringify. V2+ lida com isso.
     const { data, error } = await supabase.functions.invoke('save-google-tokens', {
-      body: JSON.stringify({ userId, accessToken, refreshToken }),
+      body: { userId, accessToken, refreshToken },
     });
 
     if (error) {
       console.error('Erro ao chamar Edge Function save-google-tokens:', error);
       let errorMessage = error.message;
       // Tenta obter detalhes do erro do contexto da resposta da função
-      if (error.context && typeof error.context.json === 'function') {
-          try {
-              const errorJson = await error.context.json();
-              errorMessage = errorJson.error || errorJson.details || error.message;
-          } catch (_) { /* Ignora erro ao parsear json */ }
-      } else if (error.context && error.context.status) {
+      if (error.context && error.context.status) {
           errorMessage = `HTTP ${error.context.status}: ${error.message}`;
+          // Tentar ler o corpo da resposta se for JSON
+          try {
+              const errorBody = await error.context.json();
+              errorMessage = errorBody.error || errorBody.details || errorMessage;
+          } catch (_) { /* Ignora erro ao parsear json */ }
       }
       throw new Error(`Erro da Edge Function: ${errorMessage}`);
     }
