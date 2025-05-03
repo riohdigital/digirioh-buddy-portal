@@ -1,93 +1,41 @@
+// Dentro de src/lib/supabase.ts
 
-import { createContext, useContext, useEffect, useState } from "react";
-import { User, Session } from "@supabase/supabase-js";
-import { supabase, signInWithGoogle as signInWithGoogleFromLib, signOut as signOutFromLib, getCurrentUser } from "@/lib/supabase";
+// Adicione esta função (ela chama a Edge Function)
+export const saveGoogleTokens = async (tokens: { accessToken: string; refreshToken: string | null }) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    console.error("saveGoogleTokens: Usuário não autenticado.");
+    throw new Error("Usuário não autenticado para salvar tokens.");
+  }
 
-// Create a context for authentication
-interface AuthContextType {
-  user: User | null;
-  session: Session | null;
-  loading: boolean;
-  signInWithGoogle: () => Promise<void>;
-  signOut: () => Promise<void>;
-}
+  // Verifica se há tokens válidos para enviar
+  if (!tokens.accessToken) {
+    console.warn("saveGoogleTokens: Access token ausente, não chamando a Edge Function.");
+    return { success: false, message: "Access token ausente."};
+  }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+  console.log(`Chamando Edge Function 'save-google-tokens' para userId: ${user.id}`);
+  console.log(` - Access Token: ${tokens.accessToken ? 'Presente' : 'Ausente'}`);
+  console.log(` - Refresh Token: ${tokens.refreshToken ? 'Presente' : 'Ausente'}`);
 
-// Provider component that wraps your app and makes auth object available to any child component that calls useAuth().
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  // Handle sign in with Google
-  const handleSignInWithGoogle = async () => {
-    try {
-      console.log("Chamando signInWithGoogle de lib/supabase...");
-      await signInWithGoogleFromLib(); // Chama a função importada e renomeada
-    } catch (error) {
-      console.error("Erro ao iniciar o fluxo de login com Google:", error);
-    }
-  };
-
-  // Handle sign out
-  const handleSignOut = async () => {
-    try {
-      await signOutFromLib();
-      setUser(null);
-      setSession(null);
-    } catch (error) {
-      console.error("Erro ao fazer logout:", error);
-    }
-  };
-
-  useEffect(() => {
-    // Set up auth state listener first
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, currentSession) => {
-        console.log('Auth state changed:', event);
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    // Then check for existing session
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      setSession(currentSession);
-      setUser(currentSession?.user ?? null);
-      setLoading(false);
+  try {
+    const { data, error } = await supabase.functions.invoke("save-google-tokens", {
+      // Envia o ID do usuário e os tokens no body
+      body: {
+        userId: user.id,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken, // Envia null se não existir
+      },
     });
 
-    // Cleanup subscription on unmount
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  // Make the context object with the user and auth methods
-  const value = {
-    user,
-    session,
-    loading,
-    signInWithGoogle: handleSignInWithGoogle,
-    signOut: handleSignOut,
-  };
-
-  // Return the context provider with the value
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-// Hook for child components to get the auth object and re-render when it changes
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    if (error) {
+      console.error("Erro ao invocar 'save-google-tokens':", error);
+      throw error; // Repassa o erro
+    }
+    console.log("Resposta da Edge Function 'save-google-tokens':", data);
+    return data; // Retorna a resposta da função (ex: { success: true })
+  } catch (invocationError) {
+    console.error("saveGoogleTokens: Exceção ao invocar Edge Function:", invocationError);
+    throw invocationError; // Re-throw
   }
-  return context;
 };
-
