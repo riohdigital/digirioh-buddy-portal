@@ -1,3 +1,4 @@
+
 import { useState, useEffect, createContext, useContext, ReactNode, useRef } from 'react'; // Adicionado useRef
 import { User, Session } from '@supabase/supabase-js';
 // Adicionada a importação de saveGoogleTokens
@@ -160,7 +161,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 }; // Fim do AuthProvider
 
-// Hook para consumir o contexto (sem alterações)
+// Hook para consumir o contexto
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
