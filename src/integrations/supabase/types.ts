@@ -9,6 +9,48 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      chat_resultados_esportivos_oficiais_history: {
+        Row: {
+          assistant_type: string
+          created_at: string
+          id: string
+          is_verified: boolean | null
+          message_content: string
+          metadata: Json | null
+          response_time: unknown | null
+          sender: string
+          session_id: string
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          assistant_type: string
+          created_at?: string
+          id?: string
+          is_verified?: boolean | null
+          message_content: string
+          metadata?: Json | null
+          response_time?: unknown | null
+          sender: string
+          session_id?: string
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          assistant_type?: string
+          created_at?: string
+          id?: string
+          is_verified?: boolean | null
+          message_content?: string
+          metadata?: Json | null
+          response_time?: unknown | null
+          sender?: string
+          session_id?: string
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       digirioh_app_whatsapp_chat_history: {
         Row: {
           id: number
@@ -56,6 +98,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          allowed_assistants: string[] | null
           avatar_url: string | null
           full_name: string | null
           google_access_token: string | null
@@ -70,6 +113,7 @@ export type Database = {
           whatsapp_jid: string | null
         }
         Insert: {
+          allowed_assistants?: string[] | null
           avatar_url?: string | null
           full_name?: string | null
           google_access_token?: string | null
@@ -84,6 +128,7 @@ export type Database = {
           whatsapp_jid?: string | null
         }
         Update: {
+          allowed_assistants?: string[] | null
           avatar_url?: string | null
           full_name?: string | null
           google_access_token?: string | null
@@ -201,6 +246,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       whatsapp_linking_codes: {
         Row: {
           code: string
@@ -230,13 +296,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_my_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      has_role: {
+        Args: { user_id: string; role: Database["public"]["Enums"]["app_role"] }
+        Returns: boolean
+      }
       insert_user_to_profiles: {
         Args: { user_id: string }
         Returns: undefined
       }
+      manage_user_assistant_plans: {
+        Args: { p_user_id: string; p_assistant_types: string[] }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -351,6 +429,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const

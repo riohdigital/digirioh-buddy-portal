@@ -9,3 +9,6 @@ verify_jwt = true
 
 [functions.auth-google-exchange]
 verify_jwt = false
+
+[functions.save-google-tokens]
+verify_jwt = true
