@@ -13,213 +13,172 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const LOG_PREFIX = "[AuthProvider]";
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  console.log(`${LOG_PREFIX} RENDER_START`);
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const tokensSavedForSessionRef = useRef<string | null>(null);
-  const isMountedRef = useRef(true);
-  const isInitialCheckDoneRef = useRef(false);
-  
-  console.log("AuthProvider: Componente renderizado/re-renderizado");
-  console.log(`AuthProvider: Antes do return do Provider. Estado loading: ${loading}, initialCheckDone: ${isInitialCheckDoneRef.current}`);
-  
-  if (loading) {
-    console.log("AuthProvider: Renderizando estado de 'Carregando'...");
-  }
-
-  // Função separada para garantir que o estado de loading seja consistentemente atualizado
-  const finishLoading = () => {
-    if (!isMountedRef.current) return;
-    
-    console.log("AuthProvider finishLoading: Finalizando o carregamento. isMounted:", isMountedRef.current);
-    setLoading(false);
-    console.log("AuthProvider finishLoading: Loading definido como FALSE");
-  };
-
-  // Salvamento de tokens em uma função separada
-  const attemptToSaveTokens = async (currentSession: Session | null, eventType: string) => {
-    console.log(`AuthProvider (${eventType}) LOG 0: attemptToSaveTokens chamado. isMounted:`, isMountedRef.current);
-    if (!isMountedRef.current) return;
-    
-    const shouldSave = 
-      currentSession?.provider_token &&
-      currentSession.user &&
-      tokensSavedForSessionRef.current !== currentSession.access_token;
-    
-    console.log(`AuthProvider (${eventType}) LOG 0.2: Verificando condições - provider_token: ${!!currentSession?.provider_token}, user: ${!!currentSession?.user}, tokenJáSalvo: ${tokensSavedForSessionRef.current === currentSession?.access_token}, Resultado shouldSave: ${shouldSave}`);
-    
-    if (shouldSave) {
-      console.log(`AuthProvider (${eventType}) LOG 1: Condições para salvar atendidas. Tentando salvar... AccessToken: ${currentSession.provider_token.substring(0, 10)}..., RefreshToken: ${currentSession.provider_refresh_token ? 'Presente' : 'Ausente'}`);
-      try {
-        await saveGoogleTokens({
-          accessToken: currentSession.provider_token,
-          refreshToken: currentSession.provider_refresh_token || null,
-        });
-        if (isMountedRef.current) {
-          tokensSavedForSessionRef.current = currentSession.access_token;
-          console.log(`AuthProvider (${eventType}) LOG 2: Tokens salvos com sucesso.`);
-        }
-      } catch (error) {
-        console.error(`AuthProvider (${eventType}) LOG 2-ERROR: Erro ao tentar salvar tokens do Google:`, error);
-      }
-    } else if (currentSession?.provider_token && currentSession.user) {
-      console.log(`AuthProvider (${eventType}) LOG 1-ALT: Tokens já salvos ou condições não atendidas.`);
-    } else {
-      console.log(`AuthProvider (${eventType}) LOG 1-ALT: Sem tokens do provedor na sessão atual.`);
-    }
-  };
+  const initialCheckDoneRef = useRef(false);
+  const effectRunRef = useRef(0); // Para contar execuções do useEffect
 
   useEffect(() => {
-    console.log("AuthProvider useEffect: Montado. isMounted:", isMountedRef.current);
-    isMountedRef.current = true;
+    effectRunRef.current += 1;
+    let isMounted = true;
+    console.log(`${LOG_PREFIX} useEffect [RUN ${effectRunRef.current}] START. isMounted: ${isMounted}`);
 
-    // Verificar sessão existente ao montar
-    const checkInitialSession = async () => {
-      if (isInitialCheckDoneRef.current) {
-        console.log("AuthProvider checkInitialSession: Verificação inicial já foi concluída, ignorando.");
+    const attemptToSaveTokens = async (currentSession: Session | null, eventType: string) => {
+      console.log(`${LOG_PREFIX} attemptToSaveTokens (${eventType}) [RUN ${effectRunRef.current}] CALLED. isMounted: ${isMounted}`);
+      if (!isMounted) {
+        console.log(`${LOG_PREFIX} attemptToSaveTokens (${eventType}) [RUN ${effectRunRef.current}] ABORT: Unmounted.`);
         return;
       }
-      
-      try {
-        console.log("AuthProvider checkInitialSession LOG 7: Iniciando. isMounted:", isMountedRef.current);
-        console.log("AuthProvider checkInitialSession LOG 8: Chamando supabase.auth.getSession().");
-        
-        const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
 
-        if (!isMountedRef.current) {
-          console.log("AuthProvider checkInitialSession LOG 9-ABORT: Componente desmontado durante a chamada.");
+      const shouldSave = currentSession?.provider_token &&
+                         currentSession.user &&
+                         tokensSavedForSessionRef.current !== currentSession.access_token;
+
+      console.log(`${LOG_PREFIX} attemptToSaveTokens (${eventType}) [RUN ${effectRunRef.current}] Conditions: provider_token: ${!!currentSession?.provider_token}, user: ${!!currentSession?.user}, tokenAlreadySavedForThisAccessToken: ${tokensSavedForSessionRef.current === currentSession?.access_token}. ShouldSave: ${shouldSave}`);
+
+      if (shouldSave) {
+        console.log(`${LOG_PREFIX} attemptToSaveTokens (${eventType}) [RUN ${effectRunRef.current}] PRE-SAVE: AccessToken: ${currentSession!.access_token?.substring(0,10)}..., RefreshToken: ${currentSession!.provider_refresh_token ? 'Presente' : 'Ausente'}`);
+        try {
+          console.log(`${LOG_PREFIX} attemptToSaveTokens (${eventType}) [RUN ${effectRunRef.current}] AWAITING saveGoogleTokens...`);
+          await saveGoogleTokens({
+            accessToken: currentSession!.provider_token!,
+            refreshToken: currentSession!.provider_refresh_token || null,
+          });
+          if (isMounted) {
+            tokensSavedForSessionRef.current = currentSession!.access_token!;
+          }
+          console.log(`${LOG_PREFIX} attemptToSaveTokens (${eventType}) [RUN ${effectRunRef.current}] SUCCESS: saveGoogleTokens completed.`);
+        } catch (error) {
+          console.error(`${LOG_PREFIX} attemptToSaveTokens (${eventType}) [RUN ${effectRunRef.current}] ERROR: Failed to save tokens:`, error);
+        }
+      } else {
+        console.log(`${LOG_PREFIX} attemptToSaveTokens (${eventType}) [RUN ${effectRunRef.current}] SKIPPED: Conditions not met or token already saved.`);
+      }
+      console.log(`${LOG_PREFIX} attemptToSaveTokens (${eventType}) [RUN ${effectRunRef.current}] END.`);
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, currentSession) => {
+        console.log(`${LOG_PREFIX} onAuthStateChange [RUN ${effectRunRef.current}] EVENT: ${event}, UserID: ${currentSession?.user?.id}. isMounted: ${isMounted}`);
+        if (!isMounted) {
+          console.log(`${LOG_PREFIX} onAuthStateChange [RUN ${effectRunRef.current}] ABORT: Unmounted.`);
+          return;
+        }
+
+        console.log(`${LOG_PREFIX} onAuthStateChange [RUN ${effectRunRef.current}] PRE-SET_STATE: current session user:`, currentSession?.user?.email);
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        console.log(`${LOG_PREFIX} onAuthStateChange [RUN ${effectRunRef.current}] POST-SET_STATE.`);
+
+        if (initialCheckDoneRef.current && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+          console.log(`${LOG_PREFIX} onAuthStateChange [RUN ${effectRunRef.current}] Event ${event} (post-initial check), calling attemptToSaveTokens.`);
+          await attemptToSaveTokens(currentSession, `LISTENER_${event}`);
+        }
+
+        if (event === 'SIGNED_OUT') {
+          console.log(`${LOG_PREFIX} onAuthStateChange [RUN ${effectRunRef.current}] Event SIGNED_OUT. Cleaning up and navigating.`);
+          if (isMounted) tokensSavedForSessionRef.current = null;
+          navigate('/');
+        }
+
+        if (initialCheckDoneRef.current && loading && isMounted) {
+            console.log(`${LOG_PREFIX} onAuthStateChange [RUN ${effectRunRef.current}] Event ${event} (post-initial check), current loading: ${loading}. Setting loading to false.`);
+            setLoading(false);
+        }
+        console.log(`${LOG_PREFIX} onAuthStateChange [RUN ${effectRunRef.current}] END of callback for event ${event}.`);
+      }
+    );
+
+    const checkInitialSession = async () => {
+      console.log(`${LOG_PREFIX} checkInitialSession [RUN ${effectRunRef.current}] START. isMounted: ${isMounted}`);
+      if (!isMounted) {
+        console.log(`${LOG_PREFIX} checkInitialSession [RUN ${effectRunRef.current}] ABORT: Unmounted at start.`);
+        // Se desmontado no início, talvez não precise setar loading false, mas é mais seguro garantir
+        if (isMounted && loading) setLoading(false);
+        return;
+      }
+
+      try {
+        console.log(`${LOG_PREFIX} checkInitialSession [RUN ${effectRunRef.current}] AWAITING supabase.auth.getSession().`);
+        const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
+        console.log(`${LOG_PREFIX} checkInitialSession [RUN ${effectRunRef.current}] RETURNED from supabase.auth.getSession(). isMounted: ${isMounted}`);
+
+        if (!isMounted) {
+          console.log(`${LOG_PREFIX} checkInitialSession [RUN ${effectRunRef.current}] ABORT: Unmounted after getSession.`);
           return;
         }
 
         if (sessionError) {
-          console.error("AuthProvider checkInitialSession LOG 9-ERROR: Erro ao obter sessão:", sessionError);
-          isInitialCheckDoneRef.current = true;
-          finishLoading();
-          return;
+          console.error(`${LOG_PREFIX} checkInitialSession [RUN ${effectRunRef.current}] ERROR from getSession:`, sessionError);
         }
 
-        console.log("AuthProvider checkInitialSession LOG 9: Sessão obtida. UserID:", initialSession?.user?.id);
-        
+        console.log(`${LOG_PREFIX} checkInitialSession [RUN ${effectRunRef.current}] PRE-SET_STATE: initial session user:`, initialSession?.user?.email);
         setSession(initialSession);
         setUser(initialSession?.user ?? null);
+        console.log(`${LOG_PREFIX} checkInitialSession [RUN ${effectRunRef.current}] POST-SET_STATE.`);
 
         if (initialSession?.user) {
-          console.log("AuthProvider checkInitialSession LOG 10: Sessão ativa encontrada. UserID:", initialSession.user.id);
+          console.log(`${LOG_PREFIX} checkInitialSession [RUN ${effectRunRef.current}] Session found. Calling attemptToSaveTokens.`);
           await attemptToSaveTokens(initialSession, 'INITIAL_SESSION_CHECK');
         } else {
-          console.log("AuthProvider checkInitialSession LOG 10-ALT: Nenhuma sessão ativa encontrada.");
+          console.log(`${LOG_PREFIX} checkInitialSession [RUN ${effectRunRef.current}] No initial session found.`);
         }
-        
       } catch (error) {
-        console.error("AuthProvider checkInitialSession LOG ERROR: Erro inesperado:", error);
+          console.error(`${LOG_PREFIX} checkInitialSession [RUN ${effectRunRef.current}] CATCH_ALL_ERROR:`, error);
       } finally {
-        if (isMountedRef.current) {
-          console.log("AuthProvider checkInitialSession LOG 11: Finalizando verificação inicial");
-          isInitialCheckDoneRef.current = true;
-          // Sempre termine o carregamento após a verificação inicial
-          finishLoading();
-        } else {
-          console.log("AuthProvider checkInitialSession LOG 11-ABORT: Componente desmontado, não atualizando estado.");
-        }
+          if (isMounted) {
+            console.log(`${LOG_PREFIX} checkInitialSession [RUN ${effectRunRef.current}] FINALLY: Setting initialCheckDoneRef=true, setLoading=false. Current loading state: ${loading}`);
+            initialCheckDoneRef.current = true;
+            setLoading(false);
+          } else {
+            console.log(`${LOG_PREFIX} checkInitialSession [RUN ${effectRunRef.current}] FINALLY: Unmounted. Not setting state.`);
+          }
       }
+      console.log(`${LOG_PREFIX} checkInitialSession [RUN ${effectRunRef.current}] END.`);
     };
 
-    // O listener de autenticação
-    const setupAuthListener = () => {
-      console.log("AuthProvider: Configurando listener de autenticação");
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        async (event, currentSession) => {
-          console.log("AuthProvider onAuthStateChange LOG 3: Evento:", event, "UserID:", currentSession?.user?.id, "isMounted:", isMountedRef.current);
-          
-          if (!isMountedRef.current) {
-            console.log("AuthProvider onAuthStateChange LOG 3-ABORT: Componente desmontado. Evento ignorado.");
-            return;
-          }
-
-          // Atualizar o estado com a nova sessão e usuário
-          setSession(currentSession);
-          setUser(currentSession?.user ?? null);
-          
-          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-            console.log("AuthProvider onAuthStateChange LOG 4: Evento", event, "chamando attemptToSaveTokens.");
-            await attemptToSaveTokens(currentSession, `LISTENER_${event}`);
-          }
-
-          if (event === 'SIGNED_OUT') {
-            console.log("AuthProvider onAuthStateChange LOG 4-ALT: Usuário deslogado, redirecionando. isMounted:", isMountedRef.current);
-            tokensSavedForSessionRef.current = null;
-            navigate('/');
-          }
-          
-          // IMPORTANTE: Marque a verificação inicial como concluída e finalize o carregamento
-          if (!isInitialCheckDoneRef.current) {
-            console.log(`AuthProvider onAuthStateChange: Evento ${event} ocorreu antes da verificação inicial terminar. Marcando como concluída.`);
-            isInitialCheckDoneRef.current = true;
-          }
-          
-          // Garantir que loading seja falso após qualquer evento de autenticação
-          console.log("AuthProvider onAuthStateChange LOG 5: Após", event, "finalizando carregamento. isMounted:", isMountedRef.current);
-          finishLoading();
-        }
-      );
-      
-      return subscription;
-    };
-
-    // SEQUÊNCIA CORRETA: primeiro configure o listener, depois verifique a sessão
-    const subscription = setupAuthListener();
     checkInitialSession();
-    
+
     return () => {
-      console.log("AuthProvider useEffect CLEANUP: Componente desmontando. Desativando isMounted e cancelando subscription.");
-      isMountedRef.current = false;
+      isMounted = false;
+      console.log(`${LOG_PREFIX} useEffect Cleanup [RUN ${effectRunRef.current}] START. Unsubscribing.`);
       subscription.unsubscribe();
+      console.log(`${LOG_PREFIX} useEffect Cleanup [RUN ${effectRunRef.current}] END.`);
     };
-  }, [navigate]);
+  }, [navigate]); // Mantenha apenas 'navigate' aqui
 
   const handleSignInWithGoogle = async () => {
+    console.log(`${LOG_PREFIX} handleSignInWithGoogle CALLED.`);
     try {
-      console.log("AuthProvider handleSignInWithGoogle: Iniciando login com Google. isMounted:", isMountedRef.current);
-      setLoading(true);
+      // Não setamos loading=true aqui, pois o fluxo de redirect e onAuthStateChange cuidará disso.
       await signInWithGoogleFromLib();
-      // O listener de autenticação cuidará de definir loading como false
+      console.log(`${LOG_PREFIX} handleSignInWithGoogle: signInWithGoogleFromLib chamado.`);
     } catch (error) {
-      console.error("AuthProvider handleSignInWithGoogle ERROR: Erro ao iniciar login:", error);
-      if (isMountedRef.current) {
-        console.log("AuthProvider handleSignInWithGoogle ERROR: Erro capturado, definindo loading=false");
-        finishLoading();
-      }
+      console.error(`${LOG_PREFIX} handleSignInWithGoogle ERROR:`, error);
+      // Se o próprio início do login falhar, talvez seja necessário setLoading(false) aqui.
+      // Mas é raro falhar antes do redirect.
     }
   };
 
   const handleSignOut = async () => {
+    console.log(`${LOG_PREFIX} handleSignOut CALLED.`);
     try {
-      console.log("AuthProvider handleSignOut: Iniciando logout. isMounted:", isMountedRef.current);
-      setLoading(true);
       await supabase.auth.signOut();
-      
-      if (isMountedRef.current) {
-        tokensSavedForSessionRef.current = null;
-        // O listener de autenticação cuidará de definir loading como false
-      }
+      // A lógica de tokensSavedForSessionRef.current = null; está no onAuthStateChange para SIGNED_OUT.
+      console.log(`${LOG_PREFIX} handleSignOut: signOut chamado.`);
     } catch (error) {
-      console.error("AuthProvider handleSignOut ERROR: Erro ao fazer logout:", error);
-      if (isMountedRef.current) {
-        console.log("AuthProvider handleSignOut ERROR: Erro capturado, definindo loading=false");
-        finishLoading();
-      }
+      console.error(`${LOG_PREFIX} handleSignOut ERROR:`, error);
     }
   };
 
-  // Log explicativo para debug
-  if (loading) {
-    console.log("AuthProvider RENDER: Mostrar tela de loading...");
-  } else {
-    console.log("AuthProvider RENDER: Mostrando conteúdo da aplicação. User:", user?.id);
-  }
-
+  console.log(`${LOG_PREFIX} RENDER_END. Loading state: ${loading}`);
   return (
     <AuthContext.Provider
       value={{
@@ -231,10 +190,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }}
     >
       {loading ? (
-         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
            <p>Carregando aplicação...</p>
+           {console.log(`${LOG_PREFIX} UI: Rendering 'Carregando...'`)}
          </div>
-      ) : children}
+      ) : (
+        <>
+          {console.log(`${LOG_PREFIX} UI: Rendering 'children'`)}
+          {children}
+        </>
+      )}
     </AuthContext.Provider>
   );
 };
