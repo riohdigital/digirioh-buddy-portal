@@ -1,13 +1,12 @@
 import { useState, useEffect, createContext, useContext, ReactNode, useRef } from 'react';
 import { User, Session } from '@supabase/supabase-js';
-// Adicionada a importação de saveGoogleTokens e renomeada signInWithGoogle
 import { supabase, signInWithGoogle as signInWithGoogleFromLib, saveGoogleTokens } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  loading: boolean;
+  loading: boolean; // Este é o estado de carregamento que precisamos gerenciar cuidadosamente
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -19,18 +18,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true); // Inicia como true
   const navigate = useNavigate();
-  // Ref para controlar se já salvamos os tokens para a sessão atual
-  const tokensSavedForSessionRef = useRef<string | null>(null); // Guarda o access_token da sessão salva
+  const tokensSavedForSessionRef = useRef<string | null>(null);
 
   useEffect(() => {
-    let isMounted = true; // Flag para verificar se o componente ainda está montado
+    let isMounted = true;
 
-    // --- Função para tentar salvar tokens ---
     const attemptToSaveTokens = async (currentSession: Session | null, eventType: string) => {
-      // Verifica se o componente ainda está montado antes de prosseguir
       if (!isMounted) return;
-
-      // Verifica se há tokens válidos e se ainda não foram salvos para este access_token
       if (
         currentSession?.provider_token &&
         currentSession.user &&
@@ -44,7 +38,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             accessToken: currentSession.provider_token,
             refreshToken: currentSession.provider_refresh_token || null,
           });
-          if (isMounted) { // Só atualiza ref se montado
+          if (isMounted) {
             tokensSavedForSessionRef.current = currentSession.access_token;
           }
           console.log(`AuthProvider (${eventType}): Chamada para salvar tokens enviada com sucesso.`);
@@ -52,105 +46,113 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           console.error(`AuthProvider (${eventType}): Erro ao tentar salvar tokens do Google:`, error);
         }
       } else if (currentSession?.provider_token && currentSession.user) {
-        // Este else if cobre o caso onde os tokens estão presentes, mas já foram salvos (ref é igual)
         console.log(`AuthProvider (${eventType}): Tokens já salvos para este access_token ou provider_token ausente.`);
       } else {
         console.log(`AuthProvider (${eventType}): Sem tokens do provedor na sessão atual para salvar.`);
       }
     };
 
-    // --- Listener de Autenticação ---
+    // Listener para mudanças de estado de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
         if (!isMounted) return;
 
-        console.log("Auth state changed:", event, "Session User ID:", currentSession?.user?.id);
+        console.log("Auth state changed (listener):", event, "Session User ID:", currentSession?.user?.id);
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
 
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          await attemptToSaveTokens(currentSession, event);
+          await attemptToSaveTokens(currentSession, `LISTENER_${event}`);
         }
 
         if (event === 'SIGNED_OUT') {
-          console.log("Usuário deslogado, redirecionando para página inicial");
+          console.log("Usuário deslogado (listener), redirecionando para página inicial");
           if (isMounted) {
             tokensSavedForSessionRef.current = null;
-            // setUser(null) e setSession(null) já são feitos acima pela atualização do currentSession
           }
-          navigate('/'); // A navegação deve ocorrer independentemente de isMounted
+          navigate('/');
         }
-        // Garante que loading seja false após o primeiro evento de autenticação ser processado
-        // e o componente ainda estar montado
-        if (loading && isMounted) {
-          setLoading(false);
+        // Apenas define loading como false aqui se o evento for INITIAL_SESSION
+        // ou se for um SIGNED_IN/OUT que efetivamente muda o estado de 'deslogado' para 'logado' ou vice-versa.
+        // A lógica de carregamento principal fica no checkSession.
+        if (event === 'INITIAL_SESSION' && isMounted) {
+            setLoading(false);
+        }
+        // Se for um SIGNED_IN e antes estava deslogado (user era null), então parou de carregar
+        else if (event === 'SIGNED_IN' && !user && isMounted) {
+            setLoading(false);
+        }
+        // Se for um SIGNED_OUT, e antes estava logado, parou de carregar (já deve estar false, mas por garantia)
+        else if (event === 'SIGNED_OUT' && isMounted) {
+            setLoading(false);
         }
       }
     );
 
-    // --- Verificação da Sessão Inicial ---
-    const checkSession = async () => {
-      console.log("AuthProvider: Verificando sessão inicial...");
+    // Verificar sessão existente ao montar
+    const checkInitialSession = async () => {
+      console.log("AuthProvider: Verificando sessão inicial (checkInitialSession)...");
+      // Define loading como true no início da verificação
+      if (isMounted) setLoading(true);
+
       const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
 
-      if (!isMounted) return;
+      if (!isMounted) return; // Verifica novamente após a chamada assíncrona
 
       if (sessionError) {
         console.error("AuthProvider: Erro ao obter sessão inicial:", sessionError);
       }
 
-      // Atualiza o estado da sessão e usuário mesmo que o listener onAuthStateChange
-      // vá disparar um evento INITIAL_SESSION logo em seguida.
-      // Isso garante que o estado seja definido o mais rápido possível.
+      console.log("AuthProvider (checkInitialSession): Sessão obtida:", initialSession?.user?.id);
       setSession(initialSession);
       setUser(initialSession?.user ?? null);
 
       if (initialSession?.user) {
-        console.log("AuthProvider: Sessão ativa inicial encontrada para:", initialSession.user.id);
-        // Tenta salvar tokens da sessão inicial
+        console.log("AuthProvider (checkInitialSession): Sessão ativa inicial encontrada para:", initialSession.user.id);
         await attemptToSaveTokens(initialSession, 'INITIAL_SESSION_CHECK');
       } else {
-        console.log("AuthProvider: Nenhuma sessão ativa inicial encontrada.");
+        console.log("AuthProvider (checkInitialSession): Nenhuma sessão ativa inicial encontrada.");
       }
-      // Define loading como false APÓS checar sessão inicial E tentar salvar tokens
-      if (isMounted) { // Verifica se ainda está montado antes de chamar setLoading
+
+      // Define loading como false APÓS toda a lógica de checkSession ter rodado
+      if (isMounted) {
         setLoading(false);
       }
     };
 
-    checkSession();
+    checkInitialSession();
 
-    // --- Limpeza do Listener ---
     return () => {
-      isMounted = false; // Marca como desmontado
+      isMounted = false;
       console.log("AuthProvider: Desinscrevendo listener de autenticação.");
       subscription.unsubscribe();
     };
-  // Removido 'loading' das dependências para evitar re-execuções desnecessárias do useEffect
-  // A lógica de 'loading' agora é gerenciada internamente.
-  }, [navigate]);
+  }, [navigate]); // Removido 'loading' da dependência, o gerenciamento de loading é interno ao effect
 
-  // --- Funções Expostas pelo Contexto ---
   const handleSignInWithGoogle = async () => {
     try {
       console.log("AuthProvider: Chamando signInWithGoogle de lib/supabase...");
+      // Não definimos loading aqui, pois o onAuthStateChange e o redirectTo cuidarão da UI
       await signInWithGoogleFromLib();
     } catch (error) {
       console.error("AuthProvider: Erro ao iniciar o fluxo de login com Google:", error);
+      if (isMounted) setLoading(false); // Garante que loading termine se houver erro no início do login
     }
   };
 
   const handleSignOut = async () => {
     try {
-        await supabase.auth.signOut();
-        tokensSavedForSessionRef.current = null; // Limpa a referência ao deslogar
-        // O listener onAuthStateChange com evento SIGNED_OUT cuidará de limpar user/session e navegar.
+      // Não definimos loading aqui, o onAuthStateChange cuidará disso
+      await supabase.auth.signOut();
+      if (isMounted) { // Atualiza ref apenas se montado
+        tokensSavedForSessionRef.current = null;
+      }
     } catch (error) {
-        console.error("Erro ao fazer logout:", error);
+      console.error("Erro ao fazer logout:", error);
+      if (isMounted) setLoading(false); // Garante que loading termine se houver erro no logout
     }
   };
 
-  // --- Retorno do Provider ---
   return (
     <AuthContext.Provider
       value={{
@@ -162,12 +164,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }}
     >
       {/* Renderiza children APENAS quando o loading inicial terminar */}
-      {!loading && children}
+      {/* Se loading for true, pode-se mostrar um spinner/tela de carregamento global aqui em vez de nada */}
+      {loading ? (
+         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+           {/* Você pode colocar seu componente de Spinner aqui */}
+           <p>Carregando aplicação...</p>
+         </div>
+      ) : children}
     </AuthContext.Provider>
   );
 };
 
-// Hook para consumir o contexto (permanece igual)
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
