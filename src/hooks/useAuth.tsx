@@ -161,7 +161,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 }; // Fim do AuthProvider
 
-// Hook para consumir o contexto
+// Hook para consumir o contexto - THIS IS THE EXPORT THAT WAS MISSING
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
