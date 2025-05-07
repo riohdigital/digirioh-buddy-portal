@@ -48,10 +48,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.log(`${LOG_PREFIX} attemptToSaveTokens (${eventType}) [RUN ${effectRunRef.current}] PRE-SAVE: AccessToken: ${currentSession!.access_token?.substring(0,10)}..., RefreshToken: ${currentSession!.provider_refresh_token ? 'Presente' : 'Ausente'}`);
         try {
           console.log(`${LOG_PREFIX} attemptToSaveTokens (${eventType}) [RUN ${effectRunRef.current}] SIMULANDO saveGoogleTokens (chamada real comentada).`);
-          // await saveGoogleTokens({ // <<<<<<<<<<< LINHA COMENTADA PARA TESTE
-          //   accessToken: currentSession!.provider_token!,
-          //   refreshToken: currentSession!.provider_refresh_token || null,
-          // });
+           await saveGoogleTokens({ // <<<<<<<<<<< LINHA COMENTADA PARA TESTE
+             accessToken: currentSession!.provider_token!,
+             refreshToken: currentSession!.provider_refresh_token || null,
+           });
           if (isMounted) {
             tokensSavedForSessionRef.current = currentSession!.access_token!;
           }
