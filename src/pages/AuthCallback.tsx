@@ -1,26 +1,21 @@
+
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // Removido useSearchParams
-import { exchangeGoogleAuthCode } from "@/lib/supabase";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function AuthCallback() {
-  // Removido useSearchParams
   const navigate = useNavigate();
   const { toast } = useToast();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
 
   useEffect(() => {
     const handleAuthCallback = async () => {
-      console.log("AuthCallback: useEffect triggered."); // Adicionado
-      console.log("AuthCallback: window.location.hash:", window.location.hash); // Adicionado
+      console.log("AuthCallback: useEffect triggered.");
+      console.log("AuthCallback: window.location.hash:", window.location.hash);
       try {
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const code = hashParams.get("code");
         const errorParam = hashParams.get("error");
         const errorDescription = hashParams.get("error_description");
-
-        console.log("AuthCallback: Parsed code:", code); // Adicionado
-        console.log("AuthCallback: Parsed errorParam:", errorParam); // Adicionado
 
         // Verifica se houve um erro retornado pelo Google no hash
         if (errorParam) {
@@ -31,28 +26,8 @@ export default function AuthCallback() {
                 variant: "destructive"
             });
             setStatus("error");
-            setTimeout(() => navigate("/"), 3000); // Aumentar tempo para ler o erro
-            return; // Interrompe a execução
-        }
-
-        // Verifica se o código existe (mesma verificação de antes, mas agora lendo do hash)
-        if (!code) {
-          console.error("Código de autorização não encontrado na URL (hash)");
-          toast({
-            title: "Erro de autenticação",
-            description: "Código de autorização não encontrado",
-            variant: "destructive"
-          });
-          setStatus("error");
-          setTimeout(() => navigate("/"), 2000);
-          return;
-        }
-        // ----- FIM DA MODIFICAÇÃO -----
-
-        if (code) {
-           console.log("AuthCallback: Calling exchangeGoogleAuthCode with code:", code.substring(0, 10) + "..."); // Adicionado
-           const result = await exchangeGoogleAuthCode(code);
-           console.log("AuthCallback: Result from exchangeGoogleAuthCode:", result); // Adicionado
+            setTimeout(() => navigate("/"), 3000);
+            return;
         }
 
         toast({
@@ -61,28 +36,26 @@ export default function AuthCallback() {
         });
 
         setStatus("success");
-        setTimeout(() => navigate("/dashboard"), 1000); // Redireciona para o dashboard
+        setTimeout(() => navigate("/dashboard"), 1000);
 
-      } catch (error: any) { // Especifica 'any' ou um tipo mais específico para error
-        console.error("AuthCallback: Error in handleAuthCallback:", error); // Adicionado para detalhar erros
+      } catch (error: any) {
+        console.error("AuthCallback: Error in handleAuthCallback:", error);
         console.error("Erro no processo de callback:", error);
         toast({
           title: "Erro de autenticação",
-          // Tenta pegar a mensagem de erro, senão usa uma padrão
           description: error?.message || "Ocorreu um erro durante o processo de login",
           variant: "destructive"
         });
 
         setStatus("error");
-        setTimeout(() => navigate("/"), 2000); // Redireciona para a home em caso de erro
+        setTimeout(() => navigate("/"), 2000);
       }
     };
 
     handleAuthCallback();
-    // Removido searchParams das dependências
   }, [navigate, toast]);
 
-  // ----- O JSX da interface continua o mesmo -----
+  // O JSX da interface continua o mesmo
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
       <div className="w-full max-w-md p-8 space-y-4 bg-white rounded-lg shadow-md">
