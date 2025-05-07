@@ -52,10 +52,16 @@ export const getCurrentSession = async () => {
   return supabase.auth.getSession();
 };
 
-// ----- Função para Salvar Tokens do Google (COM LOGS DETALHADOS) -----
+// ----- Função para Salvar Tokens do Google (COM LOGS DETALHADOS E TIMEOUT) -----
 export const saveGoogleTokens = async (tokens: { accessToken: string; refreshToken: string | null }) => {
   const LOG_PREFIX_LIB = "[lib/supabase saveGoogleTokens]";
   console.log(`${LOG_PREFIX_LIB} Iniciada com tokens: AccessToken ${tokens.accessToken ? 'Presente' : 'Ausente'}, RefreshToken ${tokens.refreshToken ? 'Presente' : 'Ausente'}`);
+
+  // Verificação inicial dos tokens
+  if (!tokens.accessToken) {
+    console.warn(`${LOG_PREFIX_LIB} Access token ausente. Não chamando a Edge Function.`);
+    throw new Error("Access token ausente, não foi possível salvar tokens.");
+  }
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -63,24 +69,32 @@ export const saveGoogleTokens = async (tokens: { accessToken: string; refreshTok
     throw new Error("Usuário não autenticado para salvar tokens.");
   }
 
-  if (!tokens.accessToken) {
-    console.warn(`${LOG_PREFIX_LIB} Access token ausente. Não chamando a Edge Function.`);
-    throw new Error("Access token ausente, não foi possível salvar tokens.");
-  }
-
   console.log(`${LOG_PREFIX_LIB} Chamando Edge Function 'save-google-tokens' para userId: ${user.id}`);
 
+  // Implementar um timeout para a chamada da Edge Function
   try {
-    console.log(`${LOG_PREFIX_LIB} PRESTES A CHAMAR supabase.functions.invoke...`);
-    const { data, error } = await supabase.functions.invoke("save-google-tokens", {
+    // Criamos uma promessa que rejeita após um timeout
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error("Timeout ao chamar Edge Function")), 10000); // 10 segundos de timeout
+    });
+    
+    // Criamos a promessa da chamada normal
+    const callPromise = supabase.functions.invoke("save-google-tokens", {
       body: {
         userId: user.id,
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken,
       },
     });
+    
+    // Usamos Promise.race para pegar o que resolver primeiro
+    console.log(`${LOG_PREFIX_LIB} PRESTES A CHAMAR supabase.functions.invoke com timeout...`);
+    const result = await Promise.race([callPromise, timeoutPromise]);
     console.log(`${LOG_PREFIX_LIB} RETORNOU de supabase.functions.invoke.`);
-
+    
+    // Agora analisamos o resultado (que será do tipo Response da função invoke)
+    const { data, error } = result as any;
+    
     if (error) {
       console.error(`${LOG_PREFIX_LIB} ERRO retornado por invoke:`, error);
       const errorMessage = error.context?.body?.error || error.message || "Erro desconhecido da Edge Function";
@@ -89,14 +103,16 @@ export const saveGoogleTokens = async (tokens: { accessToken: string; refreshTok
 
     console.log(`${LOG_PREFIX_LIB} Resposta da Edge Function 'save-google-tokens' (dados):`, data);
     if (data && data.success) {
-        return data;
+      return data;
     } else {
-        console.warn(`${LOG_PREFIX_LIB} Resposta da Edge Function não indicou sucesso ou formato inesperado:`, data);
-        throw new Error(`Resposta inesperada da Edge Function 'save-google-tokens': ${JSON.stringify(data)}`);
+      console.warn(`${LOG_PREFIX_LIB} Resposta da Edge Function não indicou sucesso ou formato inesperado:`, data);
+      throw new Error(`Resposta inesperada da Edge Function 'save-google-tokens': ${JSON.stringify(data)}`);
     }
   } catch (invocationError) {
     console.error(`${LOG_PREFIX_LIB} ERRO NO CATCH GERAL ao invocar Edge Function:`, invocationError);
-    throw invocationError;
+    // Não propagamos o erro para permitir que o fluxo de autenticação continue
+    // Apenas registramos o erro e retornamos um objeto de sucesso falso
+    return { success: false, error: invocationError.message };
   }
 };
 
