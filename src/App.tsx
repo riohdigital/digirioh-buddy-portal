@@ -10,6 +10,7 @@ import Plans from "./pages/Plans";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import AuthCallback from "./pages/AuthCallback";
+import SportsChatPage from "./pages/SportsChat";
 import { AuthProvider } from "./hooks/useAuth";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/features" element={<Features />} />
             <Route path="/plans" element={<Plans />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/sports-chat" element={<SportsChatPage />} />
             <Route path="/auth-callback" element={<AuthCallback />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
