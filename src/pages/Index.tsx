@@ -7,6 +7,7 @@ import {
   Clock, Globe, Calculator, MessageSquare 
 } from "lucide-react";
 import digiriohLogo from "@/assets/digirioh-logo.png";
+import digiriohLogoRedondo from "@/assets/digirioh-logo-redondo.png";
 import riohdigitalLogo from "@/assets/riohdigital-logo.png";
 
 export default function Index() {
