@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Features from "./pages/Features";
 import Plans from "./pages/Plans";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import AuthCallback from "./pages/AuthCallback";
@@ -25,6 +27,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/features" element={<Features />} />
             <Route path="/plans" element={<Plans />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/auth-callback" element={<AuthCallback />} />
             <Route path="*" element={<NotFound />} />

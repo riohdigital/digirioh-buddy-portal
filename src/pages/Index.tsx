@@ -6,6 +6,8 @@ import {
   Calendar, Mail, Users, PenLine, Coins, 
   Clock, Globe, Calculator, MessageSquare 
 } from "lucide-react";
+import digiriohLogo from "@/assets/digirioh-logo.png";
+import riohdigitalLogo from "@/assets/riohdigital-logo.png";
 
 export default function Index() {
   const { signInWithGoogle } = useAuth();
@@ -24,45 +26,73 @@ export default function Index() {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-20 hero-pattern">
-        <div className="container flex flex-col md:flex-row items-center justify-between">
-          <div className="md:w-1/2 space-y-6">
-            <h1 className="text-5xl font-extrabold text-digirioh-900">
-              Seu assistente digital com jeitinho brasileiro
-            </h1>
-            <p className="text-xl text-digirioh-700 max-w-md">
-              DigiRioh é seu assistente de IA para WhatsApp, ajudando com sua agenda, emails, contatos e muito mais!
-            </p>
-            <Button 
-              onClick={handleGoogleSignIn} 
-              size="lg"
-              className="text-lg px-8 py-6 bg-digirioh-600 hover:bg-digirioh-700"
-            >
-              Conectar com Google
-            </Button>
-          </div>
-          
-          <div className="md:w-1/2 mt-10 md:mt-0 flex justify-center">
-            <div className="relative w-64 h-96 rounded-3xl bg-white shadow-xl p-4 border border-digirioh-100 animate-float">
-              <div className="w-full h-8 bg-whatsapp flex items-center px-2 rounded-t-lg">
-                <div className="h-3 w-3 rounded-full bg-white mr-2"></div>
-                <span className="text-white text-xs font-medium">DigiRioh</span>
+      <section className="pt-32 pb-20 hero-gradient min-h-screen flex items-center">
+        <div className="container">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+            <div className="lg:w-1/2 space-y-8 text-center lg:text-left">
+              <div className="flex justify-center lg:justify-start">
+                <img src={digiriohLogo} alt="DigiRioh" className="h-24 w-24 animate-float" />
               </div>
-              <div className="h-full overflow-hidden rounded-b-lg bg-whatsapp-light p-3">
-                <div className="bg-white rounded-lg p-3 mb-3 inline-block max-w-[80%]">
-                  <p className="text-sm">E aí! 👋 Sou o DigiRioh, tudo bem?</p>
+              <h1 className="text-4xl md:text-6xl font-extrabold text-foreground leading-tight">
+                Seu assistente digital com 
+                <span className="text-primary"> jeitinho brasileiro</span>
+              </h1>
+              <p className="text-xl text-muted-foreground max-w-2xl">
+                DigiRioh é seu assistente de IA para WhatsApp, ajudando com sua agenda, emails, contatos e muito mais! Simples, rápido e eficiente.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Button 
+                  onClick={handleGoogleSignIn} 
+                  size="lg"
+                  className="text-lg px-8 py-6 bg-primary hover:bg-primary/90 shadow-lg"
+                >
+                  Conectar com Google
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  className="text-lg px-8 py-6"
+                  asChild
+                >
+                  <a href="/features">Ver Funcionalidades</a>
+                </Button>
+              </div>
+            </div>
+          
+            <div className="lg:w-1/2 flex justify-center">
+              <div className="relative">
+                <div className="w-80 h-[500px] rounded-3xl bg-card shadow-2xl p-6 border border-border animate-float">
+                  <div className="w-full h-12 bg-green-500 flex items-center px-4 rounded-t-2xl mb-4">
+                    <img src={digiriohLogo} alt="DigiRioh" className="h-8 w-8 mr-3" />
+                    <span className="text-white font-medium">DigiRioh</span>
+                    <div className="ml-auto flex gap-1">
+                      <div className="h-2 w-2 rounded-full bg-white/60"></div>
+                      <div className="h-2 w-2 rounded-full bg-white/60"></div>
+                      <div className="h-2 w-2 rounded-full bg-white"></div>
+                    </div>
+                  </div>
+                  <div className="h-full overflow-hidden bg-gray-50 rounded-b-2xl p-4 space-y-4">
+                    <div className="bg-white rounded-2xl p-4 shadow-sm max-w-[85%]">
+                      <p className="text-sm">E aí! 👋 Sou o DigiRioh, tudo bem?</p>
+                    </div>
+                    <div className="bg-white rounded-2xl p-4 shadow-sm max-w-[85%]">
+                      <p className="text-sm">Como posso te ajudar hoje?</p>
+                    </div>
+                    <div className="bg-primary text-primary-foreground rounded-2xl p-4 shadow-sm max-w-[85%] ml-auto">
+                      <p className="text-sm">Quero ver minha agenda de amanhã!</p>
+                    </div>
+                    <div className="bg-white rounded-2xl p-4 shadow-sm max-w-[85%]">
+                      <p className="text-sm font-medium">Claro! Você tem 3 compromissos amanhã:</p>
+                      <div className="mt-2 space-y-1">
+                        <p className="text-sm">📅 9:00 - Reunião de equipe</p>
+                        <p className="text-sm">🏥 14:30 - Médico</p>
+                        <p className="text-sm">🍽️ 19:00 - Jantar com amigos</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-white rounded-lg p-3 mb-3 inline-block max-w-[80%]">
-                  <p className="text-sm">Como posso te ajudar hoje?</p>
-                </div>
-                <div className="bg-digirioh-100 rounded-lg p-3 mb-3 inline-block max-w-[80%] ml-auto">
-                  <p className="text-sm">Quero ver minha agenda de amanhã!</p>
-                </div>
-                <div className="bg-white rounded-lg p-3 mb-3 inline-block max-w-[80%]">
-                  <p className="text-sm">Claro! Você tem 3 compromissos amanhã:</p>
-                  <p className="text-sm mt-1">9:00 - Reunião de equipe</p>
-                  <p className="text-sm">14:30 - Médico</p>
-                  <p className="text-sm">19:00 - Jantar com amigos</p>
+                <div className="absolute -top-4 -right-4 h-16 w-16 bg-primary rounded-full flex items-center justify-center shadow-lg">
+                  <MessageSquare className="h-8 w-8 text-primary-foreground" />
                 </div>
               </div>
             </div>
@@ -71,11 +101,18 @@ export default function Index() {
       </section>
       
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-background">
         <div className="container text-center">
-          <h2 className="text-3xl font-bold mb-12">Tô pronto pra te ajudar a organizar:</h2>
+          <div className="max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
+              Tô pronto pra te ajudar a organizar:
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Descubra tudo que posso fazer por você, direto no seu WhatsApp
+            </p>
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             <FeatureCard 
               title="Sua Agenda" 
               icon={Calendar} 
@@ -125,53 +162,66 @@ export default function Index() {
             />
           </div>
           
-          <div className="mt-16">
-            <Button 
-              onClick={handleGoogleSignIn} 
-              size="lg"
-              className="text-lg px-8 py-6 bg-digirioh-600 hover:bg-digirioh-700"
-            >
-              Começar Agora com Google
-            </Button>
+          <div className="mt-20">
+            <div className="bg-primary/5 rounded-3xl p-8 max-w-2xl mx-auto">
+              <h3 className="text-2xl font-bold mb-4 text-foreground">Pronto para começar?</h3>
+              <p className="text-muted-foreground mb-6">
+                Conecte sua conta Google e comece a usar o DigiRioh agora mesmo!
+              </p>
+              <Button 
+                onClick={handleGoogleSignIn} 
+                size="lg"
+                className="text-lg px-10 py-6 bg-primary hover:bg-primary/90 shadow-lg"
+              >
+                Começar Agora com Google
+              </Button>
+            </div>
           </div>
         </div>
       </section>
       
       {/* Footer */}
-      <footer className="bg-digirioh-900 text-white py-12">
+      <footer className="bg-card border-t border-border py-16">
         <div className="container">
-          <div className="flex flex-col md:flex-row justify-between">
-            <div>
-              <div className="flex items-center gap-2 text-2xl font-bold">
-                <MessageSquare className="h-6 w-6" />
-                <span>DigiRioh</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            <div className="lg:col-span-2">
+              <div className="flex items-center gap-3 mb-4">
+                <img src={digiriohLogo} alt="DigiRioh" className="h-10 w-10" />
+                <span className="text-2xl font-bold text-foreground">DigiRioh</span>
               </div>
-              <p className="mt-2 text-digirioh-100 max-w-xs">
-                Seu assistente digital com jeitinho brasileiro para te ajudar no dia a dia.
+              <p className="text-muted-foreground max-w-md leading-relaxed">
+                Seu assistente digital com jeitinho brasileiro para te ajudar no dia a dia. 
+                Simples, rápido e sempre disponível no seu WhatsApp.
               </p>
             </div>
             
-            <div className="mt-8 md:mt-0 grid grid-cols-2 gap-8">
-              <div>
-                <h3 className="font-bold mb-4">Links</h3>
-                <ul className="space-y-2">
-                  <li><a href="/features" className="hover:text-digirioh-300">Funcionalidades</a></li>
-                  <li><a href="/plans" className="hover:text-digirioh-300">Planos</a></li>
-                </ul>
-              </div>
-              
-              <div>
-                <h3 className="font-bold mb-4">Legal</h3>
-                <ul className="space-y-2">
-                  <li><a href="#" className="hover:text-digirioh-300">Termos de Uso</a></li>
-                  <li><a href="#" className="hover:text-digirioh-300">Privacidade</a></li>
-                </ul>
-              </div>
+            <div>
+              <h3 className="font-bold mb-4 text-foreground">Links</h3>
+              <ul className="space-y-3">
+                <li><a href="/features" className="text-muted-foreground hover:text-primary transition-colors">Funcionalidades</a></li>
+                <li><a href="/plans" className="text-muted-foreground hover:text-primary transition-colors">Planos</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="font-bold mb-4 text-foreground">Legal</h3>
+              <ul className="space-y-3">
+                <li><a href="/terms" className="text-muted-foreground hover:text-primary transition-colors">Termos de Uso</a></li>
+                <li><a href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacidade</a></li>
+              </ul>
             </div>
           </div>
           
-          <div className="mt-12 pt-6 border-t border-digirioh-800 text-center text-sm text-digirioh-300">
-            &copy; {new Date().getFullYear()} DigiRioh. Todos os direitos reservados.
+          <div className="pt-8 border-t border-border">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <p className="text-sm text-muted-foreground">
+                &copy; {new Date().getFullYear()} DigiRioh. Todos os direitos reservados.
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Desenvolvido por</span>
+                <img src={riohdigitalLogo} alt="Rioh Digital" className="h-6" />
+              </div>
+            </div>
           </div>
         </div>
       </footer>
@@ -191,26 +241,37 @@ function FeatureCard({
   comingSoon?: boolean;
 }) {
   return (
-    <div className={`p-6 rounded-xl border ${
-      comingSoon ? 'border-gray-200 bg-gray-50' : 'border-digirioh-100 bg-white'
-    } shadow-sm hover:shadow-md transition-shadow`}>
-      <div className="flex justify-center mb-4">
-        <div className={`p-3 rounded-full ${
-          comingSoon ? 'bg-gray-200' : 'bg-digirioh-100'
+    <div className={`p-8 rounded-2xl border feature-card ${
+      comingSoon 
+        ? 'border-border bg-muted/50 opacity-75' 
+        : 'border-border bg-card shadow-lg hover:shadow-xl'
+    } transition-all duration-300`}>
+      <div className="flex justify-center mb-6">
+        <div className={`p-4 rounded-2xl ${
+          comingSoon ? 'bg-muted' : 'bg-primary/10'
         }`}>
-          <Icon className={`h-8 w-8 ${
-            comingSoon ? 'text-gray-500' : 'text-digirioh-600'
+          <Icon className={`h-10 w-10 ${
+            comingSoon ? 'text-muted-foreground' : 'text-primary'
           }`} />
         </div>
       </div>
-      <h3 className={`text-xl font-semibold mb-2 ${
-        comingSoon ? 'text-gray-500' : 'text-digirioh-800'
+      <h3 className={`text-xl font-bold mb-3 ${
+        comingSoon ? 'text-muted-foreground' : 'text-foreground'
       }`}>
         {title}
       </h3>
-      <p className={`${comingSoon ? 'text-gray-400' : 'text-gray-600'}`}>
+      <p className={`text-base leading-relaxed ${
+        comingSoon ? 'text-muted-foreground' : 'text-muted-foreground'
+      }`}>
         {description}
       </p>
+      {comingSoon && (
+        <div className="mt-4">
+          <span className="inline-block px-3 py-1 text-xs font-medium bg-muted text-muted-foreground rounded-full">
+            Em breve
+          </span>
+        </div>
+      )}
     </div>
   );
 }

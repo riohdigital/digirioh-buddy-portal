@@ -2,8 +2,8 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import digiriohLogo from "@/assets/digirioh-logo.png";
 
 export function Navbar() {
   const { user, signOut } = useAuth();
@@ -23,34 +23,37 @@ export function Navbar() {
   };
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 py-4 transition-all ${
-      isScrolled ? "bg-white/90 backdrop-blur-md shadow-sm" : "bg-transparent"
+    <nav className={`fixed top-0 left-0 right-0 z-50 py-3 transition-all duration-300 ${
+      isScrolled ? "glass-effect shadow-lg" : "bg-transparent"
     }`}>
       <div className="container flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 text-2xl font-bold text-digirioh-700">
-          <MessageSquare className="h-8 w-8 text-digirioh-500" />
-          <span>DigiRioh</span>
+        <Link to="/" className="flex items-center gap-3 text-2xl font-bold text-primary">
+          <img src={digiriohLogo} alt="DigiRioh" className="h-10 w-10" />
+          <span className="hidden sm:block">DigiRioh</span>
         </Link>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-6">
           {!user ? (
             <>
-              <Link to="/features" className="text-digirioh-700 hover:text-digirioh-500">
+              <Link to="/features" className="text-foreground hover:text-primary transition-colors font-medium hidden sm:block">
                 Funcionalidades
               </Link>
-              <Link to="/plans" className="text-digirioh-700 hover:text-digirioh-500">
+              <Link to="/plans" className="text-foreground hover:text-primary transition-colors font-medium hidden sm:block">
                 Planos
               </Link>
+              <Button variant="default" size="sm" className="bg-primary hover:bg-primary/90">
+                Entrar
+              </Button>
             </>
           ) : (
             <>
-              <Link to="/dashboard" className="text-digirioh-700 hover:text-digirioh-500">
+              <Link to="/dashboard" className="text-foreground hover:text-primary transition-colors font-medium hidden sm:block">
                 Dashboard
               </Link>
-              <Link to="/plans" className="text-digirioh-700 hover:text-digirioh-500">
+              <Link to="/plans" className="text-foreground hover:text-primary transition-colors font-medium hidden sm:block">
                 Planos
               </Link>
-              <Button variant="outline" onClick={handleSignOut}>
+              <Button variant="outline" onClick={handleSignOut} size="sm">
                 Sair
               </Button>
             </>

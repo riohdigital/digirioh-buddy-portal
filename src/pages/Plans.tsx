@@ -2,15 +2,22 @@
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Check, MessageSquare } from "lucide-react";
-import { signInWithGoogle } from "@/lib/supabase";
+import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
+import digiriohLogo from "@/assets/digirioh-logo.png";
+import riohdigitalLogo from "@/assets/riohdigital-logo.png";
 
 export default function Plans() {
+  const { signInWithGoogle } = useAuth();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<string | null>(null);
 
   const handleGoogleSignIn = async () => {
-    await signInWithGoogle();
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      console.error("Erro ao fazer login com Google:", error);
+    }
   };
 
   useEffect(() => {
@@ -165,40 +172,47 @@ export default function Plans() {
       </section>
       
       {/* Footer */}
-      <footer className="bg-digirioh-900 text-white py-12 mt-auto">
+      <footer className="bg-card border-t border-border py-16 mt-auto">
         <div className="container">
-          <div className="flex flex-col md:flex-row justify-between">
-            <div>
-              <div className="flex items-center gap-2 text-2xl font-bold">
-                <MessageSquare className="h-6 w-6" />
-                <span>DigiRioh</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            <div className="lg:col-span-2">
+              <div className="flex items-center gap-3 mb-4">
+                <img src={digiriohLogo} alt="DigiRioh" className="h-10 w-10" />
+                <span className="text-2xl font-bold text-foreground">DigiRioh</span>
               </div>
-              <p className="mt-2 text-digirioh-100 max-w-xs">
-                Seu assistente digital com jeitinho brasileiro para te ajudar no dia a dia.
+              <p className="text-muted-foreground max-w-md leading-relaxed">
+                Seu assistente digital com jeitinho brasileiro para te ajudar no dia a dia. 
+                Simples, rápido e sempre disponível no seu WhatsApp.
               </p>
             </div>
             
-            <div className="mt-8 md:mt-0 grid grid-cols-2 gap-8">
-              <div>
-                <h3 className="font-bold mb-4">Links</h3>
-                <ul className="space-y-2">
-                  <li><a href="/" className="hover:text-digirioh-300">Home</a></li>
-                  <li><a href="/features" className="hover:text-digirioh-300">Funcionalidades</a></li>
-                </ul>
-              </div>
-              
-              <div>
-                <h3 className="font-bold mb-4">Legal</h3>
-                <ul className="space-y-2">
-                  <li><a href="#" className="hover:text-digirioh-300">Termos de Uso</a></li>
-                  <li><a href="#" className="hover:text-digirioh-300">Privacidade</a></li>
-                </ul>
-              </div>
+            <div>
+              <h3 className="font-bold mb-4 text-foreground">Links</h3>
+              <ul className="space-y-3">
+                <li><a href="/" className="text-muted-foreground hover:text-primary transition-colors">Home</a></li>
+                <li><a href="/features" className="text-muted-foreground hover:text-primary transition-colors">Funcionalidades</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="font-bold mb-4 text-foreground">Legal</h3>
+              <ul className="space-y-3">
+                <li><a href="/terms" className="text-muted-foreground hover:text-primary transition-colors">Termos de Uso</a></li>
+                <li><a href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacidade</a></li>
+              </ul>
             </div>
           </div>
           
-          <div className="mt-12 pt-6 border-t border-digirioh-800 text-center text-sm text-digirioh-300">
-            &copy; {new Date().getFullYear()} DigiRioh. Todos os direitos reservados.
+          <div className="pt-8 border-t border-border">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <p className="text-sm text-muted-foreground">
+                &copy; {new Date().getFullYear()} DigiRioh. Todos os direitos reservados.
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Desenvolvido por</span>
+                <img src={riohdigitalLogo} alt="Rioh Digital" className="h-6" />
+              </div>
+            </div>
           </div>
         </div>
       </footer>

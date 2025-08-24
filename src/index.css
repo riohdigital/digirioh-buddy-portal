@@ -77,8 +77,36 @@
   }
 }
 
-.hero-pattern {
-  background-color: #f0f9ff;
-  background-image: radial-gradient(#0ea5e9 0.5px, #f0f9ff 0.5px);
-  background-size: 10px 10px;
+/* Modern gradient backgrounds */
+.hero-gradient {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--accent)) 100%);
+}
+
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Smooth animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Card hover effects */
+.feature-card {
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
 }
