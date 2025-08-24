@@ -127,11 +127,11 @@ export default function Dashboard() {
       
       <main className="flex-1 pt-32 pb-16">
         <div className="container">
-          {/* LOGO DIGIRIOH ALTERADA AQUI */}
+          {/* ALTERAÇÃO 1: Logo DigiRioh com URL completa */}
           <div className="flex items-end gap-3 mb-8">
             <h1 className="text-3xl font-bold">Seu Painel</h1>
             <img 
-              src="/Projeto LOGO TRANSPARENTE COLORIDO 2 DigiRioh App.png" 
+              src="https://raw.githubusercontent.com/riohdigital/digirioh-buddy-portal/0b6802431d2a672c0aa65a6c8cf9e11009b65db7/public/Projeto%20LOGO%20TRANSPARENTE%20COLORIDO%202%20DigiRioh%20App.png"
               alt="DigiRioh Logo" 
               className="h-10" 
             />
@@ -182,7 +182,6 @@ export default function Dashboard() {
                     <div>
                       <p className="font-medium">WhatsApp conectado</p>
                       <p className="text-gray-600">
-                        {/* Extract phone number or mask for privacy */}
                         Número: {profile.whatsapp_jid.split("@")[0].replace(/\d(?=\d{4})/g, "*")}
                       </p>
                     </div>
@@ -343,17 +342,16 @@ export default function Dashboard() {
       <footer className="bg-digirioh-900 text-white py-8">
         <div className="container">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            {/* LOGO RIOHDIGITAL ALTERADA AQUI */}
+            {/* ALTERAÇÃO 2: Logo RiohDigital com URL completa */}
             <div className="mb-4 md:mb-0">
               <img 
-                src="/LOGO RIOH DIGITAL MiniLogo.png" 
+                src="https://raw.githubusercontent.com/riohdigital/digirioh-buddy-portal/0b6802431d2a672c0aa65a6c8cf9e11009b65db7/public/LOGO%20RIOH%20DIGITAL%20MiniLogo.png"
                 alt="Rioh Digital Logo" 
                 className="h-8" 
               />
             </div>
             
             <div className="text-center md:text-right">
-              {/* TEXTO DE COPYRIGHT ATUALIZADO */}
               <p className="text-sm text-digirioh-300">
                 &copy; {new Date().getFullYear()} Rioh Digital. Todos os direitos reservados.
               </p>
