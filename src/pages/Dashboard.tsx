@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Card } from "@/components/ui/card";
@@ -127,15 +128,7 @@ export default function Dashboard() {
       
       <main className="flex-1 pt-32 pb-16">
         <div className="container">
-          {/* ALTERAÇÃO 1: Logo DigiRioh com URL completa */}
-          <div className="flex items-end gap-3 mb-8">
-            <h1 className="text-3xl font-bold">Seu Painel</h1>
-            <img 
-              src="https://raw.githubusercontent.com/riohdigital/digirioh-buddy-portal/0b6802431d2a672c0aa65a6c8cf9e11009b65db7/public/Projeto%20LOGO%20TRANSPARENTE%20COLORIDO%202%20DigiRioh%20App.png"
-              alt="DigiRioh Logo" 
-              className="h-10" 
-            />
-          </div>
+          <h1 className="text-3xl font-bold mb-8">Seu Painel DigiRioh</h1>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Google Connection */}
@@ -182,6 +175,7 @@ export default function Dashboard() {
                     <div>
                       <p className="font-medium">WhatsApp conectado</p>
                       <p className="text-gray-600">
+                        {/* Extract phone number or mask for privacy */}
                         Número: {profile.whatsapp_jid.split("@")[0].replace(/\d(?=\d{4})/g, "*")}
                       </p>
                     </div>
@@ -288,7 +282,7 @@ export default function Dashboard() {
                       <li className="flex items-center gap-2">
                         <Check className="h-4 w-4" /> Prioridade nas respostas
                       </li>
-                       <li className="flex items-center gap-2">
+                      <li className="flex items-center gap-2">
                         <Check className="h-4 w-4" /> Suporte prioritário
                       </li>
                     </ul>
@@ -342,18 +336,14 @@ export default function Dashboard() {
       <footer className="bg-digirioh-900 text-white py-8">
         <div className="container">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            {/* ALTERAÇÃO 2: Logo RiohDigital com URL completa */}
-            <div className="mb-4 md:mb-0">
-              <img 
-                src="https://raw.githubusercontent.com/riohdigital/digirioh-buddy-portal/0b6802431d2a672c0aa65a6c8cf9e11009b65db7/public/LOGO%20RIOH%20DIGITAL%20MiniLogo.png"
-                alt="Rioh Digital Logo" 
-                className="h-8" 
-              />
+            <div className="flex items-center gap-2 text-xl font-bold mb-4 md:mb-0">
+              <MessageSquare className="h-5 w-5" />
+              <span>DigiRioh</span>
             </div>
             
             <div className="text-center md:text-right">
               <p className="text-sm text-digirioh-300">
-                &copy; {new Date().getFullYear()} Rioh Digital. Todos os direitos reservados.
+                &copy; {new Date().getFullYear()} DigiRioh. Todos os direitos reservados.
               </p>
             </div>
           </div>
