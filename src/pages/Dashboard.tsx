@@ -343,7 +343,7 @@ export default function Dashboard() {
             
             <div className="text-center md:text-right">
               <p className="text-sm text-digirioh-300">
-                &copy; {new Date().getFullYear()} DigiRioh. Todos os direitos reservados.
+                &copy; {new Date().getFullYear()} Rioh Digital AI & Automations Solutions. Todos os direitos reservados.
               </p>
             </div>
           </div>
