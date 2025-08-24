@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Card } from "@/components/ui/card";
@@ -128,7 +127,15 @@ export default function Dashboard() {
       
       <main className="flex-1 pt-32 pb-16">
         <div className="container">
-          <h1 className="text-3xl font-bold mb-8">Seu Painel DigiRioh</h1>
+          {/* LOGO DIGIRIOH ALTERADA AQUI */}
+          <div className="flex items-end gap-3 mb-8">
+            <h1 className="text-3xl font-bold">Seu Painel</h1>
+            <img 
+              src="/Projeto LOGO TRANSPARENTE COLORIDO 2 DigiRioh App.png" 
+              alt="DigiRioh Logo" 
+              className="h-10" 
+            />
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Google Connection */}
@@ -282,7 +289,7 @@ export default function Dashboard() {
                       <li className="flex items-center gap-2">
                         <Check className="h-4 w-4" /> Prioridade nas respostas
                       </li>
-                      <li className="flex items-center gap-2">
+                       <li className="flex items-center gap-2">
                         <Check className="h-4 w-4" /> Suporte prioritário
                       </li>
                     </ul>
@@ -336,14 +343,19 @@ export default function Dashboard() {
       <footer className="bg-digirioh-900 text-white py-8">
         <div className="container">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center gap-2 text-xl font-bold mb-4 md:mb-0">
-              <MessageSquare className="h-5 w-5" />
-              <span>DigiRioh</span>
+            {/* LOGO RIOHDIGITAL ALTERADA AQUI */}
+            <div className="mb-4 md:mb-0">
+              <img 
+                src="/LOGO RIOH DIGITAL MiniLogo.png" 
+                alt="Rioh Digital Logo" 
+                className="h-8" 
+              />
             </div>
             
             <div className="text-center md:text-right">
+              {/* TEXTO DE COPYRIGHT ATUALIZADO */}
               <p className="text-sm text-digirioh-300">
-                &copy; {new Date().getFullYear()} DigiRioh. Todos os direitos reservados.
+                &copy; {new Date().getFullYear()} Rioh Digital. Todos os direitos reservados.
               </p>
             </div>
           </div>
