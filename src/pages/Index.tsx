@@ -64,7 +64,7 @@ export default function Index() {
               <div className="relative">
                 <div className="w-80 h-[500px] rounded-3xl bg-card shadow-2xl p-6 border border-border animate-float">
                   <div className="w-full h-12 bg-green-500 flex items-center px-4 rounded-t-2xl mb-4">
-                    <img src={digiriohLogo} alt="DigiRioh" className="h-8 w-8 mr-3" />
+                    <img src={digiriohLogoRedondo} alt="DigiRioh" className="h-8 w-8 mr-3" />
                     <span className="text-white font-medium">DigiRioh</span>
                     <div className="ml-auto flex gap-1">
                       <div className="h-2 w-2 rounded-full bg-white/60"></div>
