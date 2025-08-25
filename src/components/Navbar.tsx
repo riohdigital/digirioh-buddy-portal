@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import digiriohLogo from "@/assets/digirioh-logo.png";
+import digiriohLogoText from "@/assets/digirioh-logo-text.png";
 
 export function Navbar() {
   const { user, signOut } = useAuth();
@@ -27,9 +28,9 @@ export function Navbar() {
       isScrolled ? "glass-effect shadow-lg" : "bg-transparent"
     }`}>
       <div className="container flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-3 text-2xl font-bold text-primary">
+        <Link to="/" className="flex items-center gap-3">
           <img src={digiriohLogo} alt="DigiRioh" className="h-10 w-10" />
-          <span className="hidden sm:block">DigiRioh</span>
+          <img src={digiriohLogoText} alt="DigiRioh" className="h-10 hidden sm:block" />
         </Link>
         
         <div className="flex items-center gap-6">
