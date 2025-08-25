@@ -213,7 +213,7 @@ export default function Index() {
           <div className="pt-8 border-t border-border">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-sm text-muted-foreground">
-                &copy; {new Date().getFullYear()} DigiRioh. Todos os direitos reservados.
+                &copy; {new Date().getFullYear()} Rioh Digital A.I & Automations Solutions. Todos os direitos reservados.
               </p>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground">Desenvolvido por</span>
