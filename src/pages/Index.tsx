@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/Navbar";
 import { useAuth } from "@/hooks/useAuth";
@@ -14,7 +13,7 @@ export default function Index() {
   const { signInWithGoogle } = useAuth();
 
   const handleGoogleSignIn = async () => {
-    console.log("Botão 'Conectar com Google' clicado"); // Adicione esta linha
+    console.log("Botão 'Conectar com Google' clicado");
     try {
       await signInWithGoogle();
     } catch (error) {
@@ -23,7 +22,7 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
       {/* Hero Section */}
@@ -39,13 +38,13 @@ export default function Index() {
                 <span className="text-primary"> jeitinho brasileiro</span>
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl">
-                DigiRioh é seu assistente de IA para WhatsApp, ajudando com sua agenda, emails, contatos e muito mais! Simples, rápido e eficiente.
+                Gerencie sua vida digital sem sair do WhatsApp. O DigiRioh organiza sua agenda, envia seus e-mails e busca seus contatos, tudo através de uma simples conversa.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button 
                   onClick={handleGoogleSignIn} 
                   size="lg"
-                  className="text-lg px-8 py-6 bg-primary hover:bg-primary/90 shadow-lg"
+                  className="text-lg px-8 py-6 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg"
                 >
                   Conectar com Google
                 </Button>
@@ -55,44 +54,41 @@ export default function Index() {
                   className="text-lg px-8 py-6"
                   asChild
                 >
-                  <a href="/features">Ver Funcionalidades</a>
+                  <a href="#features">Ver Funcionalidades</a>
                 </Button>
               </div>
             </div>
           
             <div className="lg:w-1/2 flex justify-center">
               <div className="relative">
-                {/* ADICIONADO: flex flex-col para controlar o layout interno */}
                 <div className="w-80 h-[500px] rounded-3xl bg-card shadow-2xl p-6 border border-border animate-float flex flex-col">
-                  <div className="w-full h-12 bg-green-500 flex items-center px-4 rounded-t-2xl mb-4 flex-shrink-0">
+                  <div className="w-full h-12 bg-primary flex items-center px-4 rounded-t-2xl mb-4 flex-shrink-0">
                     <img src={digiriohLogoRedondo} alt="DigiRioh" className="h-8 w-8 mr-3" />
-                    <span className="text-white font-medium">DigiRioh</span>
+                    <span className="text-primary-foreground font-medium">DigiRioh</span>
                     <div className="ml-auto flex gap-1">
-                      <div className="h-2 w-2 rounded-full bg-white/60"></div>
-                      <div className="h-2 w-2 rounded-full bg-white/60"></div>
-                      <div className="h-2 w-2 rounded-full bg-white"></div>
+                      <div className="h-2 w-2 rounded-full bg-primary-foreground/60"></div>
+                      <div className="h-2 w-2 rounded-full bg-primary-foreground/60"></div>
+                      <div className="h-2 w-2 rounded-full bg-primary-foreground"></div>
                     </div>
                   </div>
-                  {/* ALTERADO: h-full para flex-1 e overflow-hidden para overflow-y-auto */}
                   <div className="flex-1 overflow-y-auto bg-gray-50 rounded-b-2xl p-4 space-y-4">
                     <div className="bg-white rounded-2xl p-4 shadow-sm max-w-[85%]">
-                      <p className="text-sm">E aí! 👋 Sou o DigiRioh, tudo bem?</p>
+                      <p className="text-sm text-slate-800">E aí! 👋 Sou o DigiRioh, tudo bem?</p>
                     </div>
                     <div className="bg-white rounded-2xl p-4 shadow-sm max-w-[85%]">
-                      <p className="text-sm">Como posso te ajudar hoje?</p>
+                      <p className="text-sm text-slate-800">Como posso te ajudar hoje?</p>
                     </div>
                     <div className="bg-primary text-primary-foreground rounded-2xl p-4 shadow-sm max-w-[85%] ml-auto">
                       <p className="text-sm">Quero ver minha agenda de amanhã!</p>
                     </div>
                     <div className="bg-white rounded-2xl p-4 shadow-sm max-w-[85%]">
-                      <p className="text-sm font-medium">Claro! Você tem 3 compromissos amanhã:</p>
-                      <div className="mt-2 space-y-1">
+                      <p className="text-sm font-medium text-slate-900">Claro! Você tem 3 compromissos amanhã:</p>
+                      <div className="mt-2 space-y-1 text-slate-700">
                         <p className="text-sm">📅 9:00 - Reunião de equipe</p>
                         <p className="text-sm">🏥 14:30 - Médico</p>
                         <p className="text-sm">🍽️ 19:00 - Jantar com amigos</p>
                       </div>
                     </div>
-                    {/* Pode adicionar mais mensagens aqui e a rolagem aparecerá se necessário */}
                   </div>
                 </div>
                 <div className="absolute -top-4 -right-4 h-16 w-16 bg-primary rounded-full flex items-center justify-center shadow-lg">
@@ -105,7 +101,7 @@ export default function Index() {
       </section>
       
       {/* Features Section */}
-      <section className="py-20 bg-background">
+      <section id="features" className="py-20 bg-background">
         <div className="container text-center">
           <div className="max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
@@ -120,49 +116,47 @@ export default function Index() {
             <FeatureCard 
               title="Sua Agenda" 
               icon={Calendar} 
-              description="Acesso fácil aos seus compromissos e eventos" 
+              description="Nunca mais perca um compromisso. Agende, cancele e consulte seus eventos com uma mensagem." 
             />
             <FeatureCard 
               title="Seus E-mails" 
               icon={Mail} 
-              description="Gerencie suas mensagens sem abrir o Gmail" 
+              description="Leia, responda e envie e-mails sem precisar abrir sua caixa de entrada. A produtividade na palma da sua mão." 
             />
             <FeatureCard 
               title="Seus Contatos" 
               icon={Users} 
-              description="Encontre e gerencie contatos rapidamente" 
+              description="Precisa de um e-mail ou telefone? Peça ao DigiRioh para buscar em seus contatos e agilizar suas tarefas." 
             />
             <FeatureCard 
               title="Criação de Textos" 
               icon={PenLine} 
-              description="Ajuda para escrever mensagens e documentos" 
+              description="Sem inspiração? Peça ajuda para criar rascunhos de e-mails, posts para redes sociais ou qualquer texto." 
             />
             <FeatureCard 
               title="Suas Finanças" 
               icon={Coins} 
-              description="Em breve!" 
-              comingSoon 
+              description="Acompanhe seus gastos e receitas de forma inteligente e conversacional." 
             />
             <FeatureCard 
               title="Mestre do Tempo" 
               icon={Clock} 
-              description="Em breve!" 
-              comingSoon 
+              description="Verifique a previsão do tempo para qualquer lugar, a qualquer hora." 
             />
             <FeatureCard 
               title="Buscas na Web" 
               icon={Globe} 
-              description="Informações sem sair do WhatsApp" 
+              description="Obtenha respostas e informações da internet sem sair do seu chat." 
             />
             <FeatureCard 
               title="Cálculos Rápidos" 
               icon={Calculator} 
-              description="Resolva operações matemáticas facilmente" 
+              description="Precisa fazer uma conta rápida? É só me perguntar!" 
             />
             <FeatureCard 
               title="E muito mais!" 
               icon={MessageSquare} 
-              description="É só me pedir, e eu faço acontecer! 😉" 
+              description="Minhas habilidades estão sempre evoluindo. É só me pedir, e eu faço acontecer! 😉" 
             />
           </div>
           
@@ -175,7 +169,7 @@ export default function Index() {
               <Button 
                 onClick={handleGoogleSignIn} 
                 size="lg"
-                className="text-lg px-10 py-6 bg-primary hover:bg-primary/90 shadow-lg"
+                className="text-lg px-10 py-6 bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg"
               >
                 Começar Agora com Google
               </Button>
@@ -202,7 +196,7 @@ export default function Index() {
             <div>
               <h3 className="font-bold mb-4 text-foreground">Links</h3>
               <ul className="space-y-3">
-                <li><a href="/features" className="text-muted-foreground hover:text-primary transition-colors">Funcionalidades</a></li>
+                <li><a href="#features" className="text-muted-foreground hover:text-primary transition-colors">Funcionalidades</a></li>
                 <li><a href="/plans" className="text-muted-foreground hover:text-primary transition-colors">Planos</a></li>
               </ul>
             </div>
@@ -233,6 +227,7 @@ export default function Index() {
   );
 }
 
+// Componente auxiliar para os cards de funcionalidades
 function FeatureCard({ 
   title, 
   icon: Icon, 
@@ -248,7 +243,7 @@ function FeatureCard({
     <div className={`p-8 rounded-2xl border feature-card ${
       comingSoon 
         ? 'border-border bg-muted/50 opacity-75' 
-        : 'border-border bg-card shadow-lg hover:shadow-xl'
+        : 'border-border bg-card shadow-lg hover:shadow-xl transform hover:-translate-y-2'
     } transition-all duration-300`}>
       <div className="flex justify-center mb-6">
         <div className={`p-4 rounded-2xl ${
