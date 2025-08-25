@@ -29,7 +29,6 @@ export function Navbar() {
     }`}>
       <div className="container flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3">
-          <img src={digiriohLogo} alt="DigiRioh" className="h-10 w-10" />
           <img src={digiriohLogoText} alt="DigiRioh" className="h-10 hidden sm:block" />
         </Link>
         
