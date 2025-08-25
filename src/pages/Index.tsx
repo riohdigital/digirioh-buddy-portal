@@ -62,8 +62,9 @@ export default function Index() {
           
             <div className="lg:w-1/2 flex justify-center">
               <div className="relative">
-                <div className="w-80 h-[500px] rounded-3xl bg-card shadow-2xl p-6 border border-border animate-float">
-                  <div className="w-full h-12 bg-green-500 flex items-center px-4 rounded-t-2xl mb-4">
+                {/* ADICIONADO: flex flex-col para controlar o layout interno */}
+                <div className="w-80 h-[500px] rounded-3xl bg-card shadow-2xl p-6 border border-border animate-float flex flex-col">
+                  <div className="w-full h-12 bg-green-500 flex items-center px-4 rounded-t-2xl mb-4 flex-shrink-0">
                     <img src={digiriohLogoRedondo} alt="DigiRioh" className="h-8 w-8 mr-3" />
                     <span className="text-white font-medium">DigiRioh</span>
                     <div className="ml-auto flex gap-1">
@@ -72,7 +73,8 @@ export default function Index() {
                       <div className="h-2 w-2 rounded-full bg-white"></div>
                     </div>
                   </div>
-                  <div className="h-full overflow-hidden bg-gray-50 rounded-b-2xl p-4 space-y-4">
+                  {/* ALTERADO: h-full para flex-1 e overflow-hidden para overflow-y-auto */}
+                  <div className="flex-1 overflow-y-auto bg-gray-50 rounded-b-2xl p-4 space-y-4">
                     <div className="bg-white rounded-2xl p-4 shadow-sm max-w-[85%]">
                       <p className="text-sm">E aí! 👋 Sou o DigiRioh, tudo bem?</p>
                     </div>
@@ -90,6 +92,7 @@ export default function Index() {
                         <p className="text-sm">🍽️ 19:00 - Jantar com amigos</p>
                       </div>
                     </div>
+                    {/* Pode adicionar mais mensagens aqui e a rolagem aparecerá se necessário */}
                   </div>
                 </div>
                 <div className="absolute -top-4 -right-4 h-16 w-16 bg-primary rounded-full flex items-center justify-center shadow-lg">
