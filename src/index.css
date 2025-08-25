@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,8 +13,15 @@
     --popover: 0 0% 100%;
     --popover-foreground: 210 25% 10%;
 
-    --primary: 196 100% 45%;
-    --primary-foreground: 0 0% 100%;
+    /* --- CORES PRINCIPAIS ALTERADAS PARA VERDE DIGIRIOH --- */
+    --primary: 145 63% 42%;            /* Verde DigiRioh (#22C55E) */
+    --primary-foreground: 0 0% 100%;    /* Texto branco para contraste */
+    
+    --ring: 145 63% 42%;               /* Anel de foco usa o mesmo verde */
+
+    --accent: 145 70% 95%;             /* Verde bem claro para fundos e gradientes */
+    --accent-foreground: 145 63% 30%;   /* Texto para o accent */
+    /* -------------------------------------------------------- */
 
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -23,16 +29,12 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 196 100% 95%;
-    --accent-foreground: 196 100% 30%;
-
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 196 100% 45%;
-
+    
     --radius: 0.5rem;
   }
 
@@ -46,8 +48,15 @@
     --popover: 210 25% 12%;
     --popover-foreground: 210 25% 98%;
 
-    --primary: 196 100% 45%;
-    --primary-foreground: 0 0% 100%;
+    /* --- CORES PRINCIPAIS (TEMA ESCURO) ALTERADAS PARA VERDE DIGIRIOH --- */
+    --primary: 145 63% 49%;            /* Verde mais claro para tema escuro (#34D399) */
+    --primary-foreground: 145 90% 10%; /* Texto escuro para contraste no verde claro */
+
+    --ring: 145 63% 49%;               /* Anel de foco usa o mesmo verde claro */
+    
+    --accent: 145 50% 15%;             /* Verde bem escuro para fundos e gradientes */
+    --accent-foreground: 145 63% 80%;   /* Texto para o accent */
+    /* ------------------------------------------------------------------ */
 
     --secondary: 210 25% 18%;
     --secondary-foreground: 210 25% 98%;
@@ -55,15 +64,11 @@
     --muted: 210 25% 18%;
     --muted-foreground: 215 25% 70%;
 
-    --accent: 196 100% 20%;
-    --accent-foreground: 196 100% 80%;
-
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 25% 98%;
 
     --border: 210 25% 18%;
     --input: 210 25% 18%;
-    --ring: 196 100% 45%;
   }
 }
 
@@ -78,6 +83,7 @@
 }
 
 /* Modern gradient backgrounds */
+/* Agora usará o novo --accent verde claro, resultando em um gradiente mais sutil e alinhado */
 .hero-gradient {
   background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--accent)) 100%);
 }
