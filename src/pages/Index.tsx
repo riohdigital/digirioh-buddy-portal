@@ -63,7 +63,7 @@ export default function Index() {
               <div className="relative">
                 <div className="w-80 h-[500px] rounded-3xl bg-card shadow-2xl p-6 border border-border animate-float flex flex-col">
                   <div className="w-full h-12 bg-primary flex items-center px-4 rounded-t-2xl mb-4 flex-shrink-0">
-                    <img src={digiriohLogoRedondo} alt="DigiRioh" className="h-8 w-8 mr-3" />
+                    <img src={digiriohLogoRedondo} alt="DigiRioh App Whatsapp" className="h-8 w-8 mr-3" />
                     <span className="text-primary-foreground font-medium">DigiRioh</span>
                     <div className="ml-auto flex gap-1">
                       <div className="h-2 w-2 rounded-full bg-primary-foreground/60"></div>
