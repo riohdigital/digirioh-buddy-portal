@@ -8,7 +8,7 @@ import digiriohLogo from "@/assets/digirioh-logo.png";
 import riohdigitalLogo from "@/assets/riohdigital-logo.png";
 
 export default function Plans() {
-  const { signInWithGoogle } = useAuth();
+  const { signInWithGoogle, user } = useAuth();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<string | null>(null);
 
@@ -31,32 +31,36 @@ export default function Plans() {
       <Navbar />
       
       {/* Header */}
-      <section className="pt-32 pb-16 bg-digirioh-50">
+      <section className="pt-32 pb-16 hero-gradient">
         <div className="container text-center">
-          <h1 className="text-4xl font-bold mb-4 text-digirioh-800">Planos e Preços</h1>
-          <p className="text-xl text-digirioh-600 max-w-2xl mx-auto">
+          <h1 className="text-4xl font-bold mb-4 text-foreground">Planos e Preços</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Escolha o plano que melhor se adapta às suas necessidades e potencialize seu uso do DigiRioh.
           </p>
-          {currentPlan && (
-            <div className="mt-6 inline-block px-4 py-2 bg-digirioh-100 text-digirioh-800 rounded-full">
+          {user ? (
+            <div className="mt-6 inline-block px-4 py-2 bg-primary/10 text-primary rounded-full">
               Seu plano atual: <span className="font-bold">{currentPlan === "free" ? "Gratuito" : "Pro"}</span>
+            </div>
+          ) : (
+            <div className="mt-6 inline-block px-4 py-2 bg-primary/10 text-primary rounded-full">
+              Selecione um Plano Abaixo
             </div>
           )}
         </div>
       </section>
       
       {/* Plans */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-background">
         <div className="container">
           <div className="flex flex-col md:flex-row gap-8 justify-center">
             {/* Free Plan */}
-            <div className="w-full md:w-96 border border-gray-200 rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-full md:w-96 border feature-card border-border rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 bg-card">
               <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold mb-2">Plano Gratuito</h2>
-                <p className="text-gray-500">Para começar a usar</p>
+                <h2 className="text-2xl font-bold mb-2 text-foreground">Plano Gratuito</h2>
+                <p className="text-muted-foreground">Para começar a usar</p>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">R$ 0</span>
-                  <span className="text-gray-500">/mês</span>
+                  <span className="text-4xl font-bold text-foreground">R$ 0</span>
+                  <span className="text-muted-foreground">/mês</span>
                 </div>
               </div>
               
@@ -71,29 +75,29 @@ export default function Plans() {
                 <PlanFeature text="Sem suporte prioritário" included={false} />
               </div>
               
-              {currentPlan === "free" ? (
-                <Button className="w-full bg-gray-300 hover:bg-gray-400 cursor-default" disabled>
+              {currentPlan === "free" && user ? (
+                <Button className="w-full bg-muted text-muted-foreground cursor-default" disabled>
                   Plano Atual
                 </Button>
               ) : (
-                <Button className="w-full" onClick={handleGoogleSignIn}>
+                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" onClick={handleGoogleSignIn}>
                   Selecionar Plano
                 </Button>
               )}
             </div>
             
             {/* Pro Plan */}
-            <div className="w-full md:w-96 border-2 border-digirioh-500 rounded-xl p-8 shadow-md hover:shadow-lg transition-shadow relative">
-              <div className="absolute top-0 right-0 bg-digirioh-500 text-white px-4 py-1 rounded-bl-lg rounded-tr-lg text-sm font-medium">
+            <div className="w-full md:w-96 border-2 border-primary rounded-2xl p-8 shadow-2xl hover:shadow-2xl transition-all duration-300 relative bg-card">
+              <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-4 py-1 rounded-bl-lg rounded-tr-lg text-sm font-medium">
                 Popular
               </div>
               
               <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold mb-2">Plano Pro</h2>
-                <p className="text-gray-500">Para uso avançado</p>
+                <h2 className="text-2xl font-bold mb-2 text-foreground">Plano Pro</h2>
+                <p className="text-muted-foreground">Para uso avançado</p>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">R$ 29,90</span>
-                  <span className="text-gray-500">/mês</span>
+                  <span className="text-4xl font-bold text-foreground">R$ 9,90</span>
+                  <span className="text-muted-foreground">/mês</span>
                 </div>
               </div>
               
@@ -109,11 +113,11 @@ export default function Plans() {
               </div>
               
               {currentPlan === "pro" ? (
-                <Button className="w-full bg-gray-300 hover:bg-gray-400 cursor-default" disabled>
+                <Button className="w-full bg-muted text-muted-foreground cursor-default" disabled>
                   Plano Atual
                 </Button>
               ) : (
-                <Button className="w-full bg-digirioh-600 hover:bg-digirioh-700" onClick={handleGoogleSignIn}>
+                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground" onClick={handleGoogleSignIn}>
                   Selecionar Plano
                 </Button>
               )}
@@ -130,7 +134,7 @@ export default function Plans() {
       </section>
       
       {/* FAQ */}
-      <section className="py-16 bg-digirioh-50">
+      <section className="py-16 bg-background">
         <div className="container">
           <h2 className="text-3xl font-bold mb-12 text-center">Perguntas Frequentes</h2>
           
@@ -224,13 +228,13 @@ function PlanFeature({ text, included = true }: { text: string; included?: boole
   return (
     <div className="flex items-center">
       {included ? (
-        <Check className="h-5 w-5 text-green-500 mr-3 shrink-0" />
+        <Check className="h-5 w-5 text-primary mr-3 shrink-0" />
       ) : (
-        <div className="h-5 w-5 text-gray-300 mr-3 flex items-center justify-center">
-          <div className="h-1 w-1 bg-gray-300 rounded-full"></div>
+        <div className="h-5 w-5 text-muted-foreground mr-3 flex items-center justify-center">
+          <div className="h-1 w-1 bg-muted-foreground rounded-full"></div>
         </div>
       )}
-      <p className={included ? "text-gray-700" : "text-gray-400"}>{text}</p>
+      <p className={included ? "text-foreground" : "text-muted-foreground"}>{text}</p>
     </div>
   );
 }

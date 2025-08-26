@@ -1,6 +1,6 @@
 
 import { Navbar } from "@/components/Navbar";
-import { Calendar, Mail, Users, PenLine, Coins, Clock, Globe, Calculator, MessageSquare, Smartphone, MapPin } from "lucide-react";
+import { Calendar, Mail, Users, PenLine, Coins, Clock, Globe, Calculator, MessageSquare, Smartphone, MapPin, CheckSquare, ContactRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import digiriohLogo from "@/assets/digirioh-logo.png";
@@ -22,106 +22,103 @@ export default function Features() {
       <Navbar />
       
       {/* Header */}
-      <section className="pt-32 pb-16 bg-digirioh-50">
+      <section className="pt-32 pb-16 hero-gradient">
         <div className="container text-center">
-          <h1 className="text-4xl font-bold mb-4 text-digirioh-800">Funcionalidades do DigiRioh</h1>
-          <p className="text-xl text-digirioh-600 max-w-2xl mx-auto">
+          <h1 className="text-4xl font-bold mb-4 text-foreground">Funcionalidades do DigiRioh</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Conheça tudo o que o DigiRioh pode fazer para facilitar seu dia a dia, direto do seu WhatsApp.
           </p>
         </div>
       </section>
       
       {/* Google Connection */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-background">
         <div className="container">
-          <div className="flex flex-col md:flex-row items-center gap-12">
-            <div className="md:w-1/2">
-              <h2 className="text-3xl font-bold mb-6 text-digirioh-800">Conexão com Google</h2>
-              <p className="text-lg text-gray-600 mb-6">
-                A conexão com o Google é o método de acesso ao DigiRioh e também habilita as funcionalidades de agenda e email.
+          <div className="max-w-4xl mx-auto text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
+              Conecte com seu Google
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Para acessar todas as funcionalidades, você precisa conectar sua conta Google. 
+              É rápido, seguro e você mantém controle total dos seus dados.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            <div className="p-8 rounded-2xl border feature-card border-border bg-card shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300">
+              <div className="flex items-center justify-center mb-6">
+                <div className="p-4 rounded-2xl bg-primary/10">
+                  <Mail className="h-10 w-10 text-primary" />
+                </div>
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-foreground text-center">Acesso ao Gmail</h3>
+              <p className="text-muted-foreground text-center">
+                Leio, respondo e envio e-mails para você. Nunca mais perca mensagens importantes.
               </p>
-              <p className="text-lg text-gray-600 mb-6">
-                Com apenas um clique, você autoriza o DigiRioh a acessar sua agenda e emails, permitindo que ele te ajude a gerenciar compromissos e mensagens.
+            </div>
+            
+            <div className="p-8 rounded-2xl border feature-card border-border bg-card shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300">
+              <div className="flex items-center justify-center mb-6">
+                <div className="p-4 rounded-2xl bg-primary/10">
+                  <Calendar className="h-10 w-10 text-primary" />
+                </div>
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-foreground text-center">Acesso ao Google Calendar</h3>
+              <p className="text-muted-foreground text-center">
+                Gerencio sua agenda completa. Criação, edição e consulta de eventos de forma inteligente.
+              </p>
+            </div>
+
+            <div className="p-8 rounded-2xl border feature-card border-border bg-card shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300">
+              <div className="flex items-center justify-center mb-6">
+                <div className="p-4 rounded-2xl bg-primary/10">
+                  <CheckSquare className="h-10 w-10 text-primary" />
+                </div>
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-foreground text-center">Acesso ao Google Tasks</h3>
+              <p className="text-muted-foreground text-center">
+                Cuido da sua lista de afazeres. Adicione, complete e delete tarefas com comandos simples.
+              </p>
+            </div>
+
+            <div className="p-8 rounded-2xl border feature-card border-border bg-card shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300">
+              <div className="flex items-center justify-center mb-6">
+                <div className="p-4 rounded-2xl bg-primary/10">
+                  <ContactRound className="h-10 w-10 text-primary" />
+                </div>
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-foreground text-center">Acesso ao Google Contacts</h3>
+              <p className="text-muted-foreground text-center">
+                Sua agenda de contatos sempre à mão. Busco telefones, e-mails e crio novos contatos.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-primary/5 rounded-2xl p-8 text-center">
+            <div className="max-w-3xl mx-auto">
+              <Smartphone className="h-16 w-16 text-primary mx-auto mb-6" />
+              <h3 className="text-2xl font-bold mb-4 text-foreground">Conecte via WhatsApp</h3>
+              <p className="text-lg text-muted-foreground mb-6">
+                Depois de conectar com Google, você receberá instruções para vincular o DigiRioh ao seu WhatsApp. 
+                É seguro e você pode desconectar a qualquer momento.
               </p>
               <Button 
                 onClick={handleGoogleSignIn} 
                 size="lg"
-                className="text-lg px-6 py-5 bg-digirioh-600 hover:bg-digirioh-700"
+                className="text-lg px-8 py-6 bg-primary hover:bg-primary/90 text-primary-foreground"
               >
-                Conectar com Google
+                Conectar Agora
               </Button>
             </div>
-            <div className="md:w-1/2 flex justify-center">
-              <div className="relative">
-                <div className="rounded-xl bg-white shadow-xl p-6 border border-gray-200 max-w-md">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
-                      <Mail className="h-6 w-6 text-red-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Acesso ao Gmail</h3>
-                      <p className="text-sm text-gray-500">Gerencie emails sem sair do WhatsApp</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                      <Calendar className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Acesso ao Google Calendar</h3>
-                      <p className="text-sm text-gray-500">Consulte e crie eventos facilmente</p>
-                    </div>
-                  </div>
-                  <div className="absolute -top-3 -right-3 h-8 w-8 bg-green-500 rounded-full flex items-center justify-center text-white">
-                    ✓
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
       
-      {/* WhatsApp Connection */}
-      <section className="py-16 bg-digirioh-50">
-        <div className="container">
-          <div className="flex flex-col md:flex-row-reverse items-center gap-12">
-            <div className="md:w-1/2">
-              <h2 className="text-3xl font-bold mb-6 text-digirioh-800">Conexão com WhatsApp</h2>
-              <p className="text-lg text-gray-600 mb-6">
-                Após conectar com Google, vincule sua conta ao WhatsApp para receber assistência diretamente no seu celular.
-              </p>
-              <p className="text-lg text-gray-600 mb-6">
-                É simples: gere um código no portal e envie para o número do DigiRioh no WhatsApp. Pronto! Seu assistente estará disponível 24/7.
-              </p>
-            </div>
-            <div className="md:w-1/2 flex justify-center">
-              <div className="w-64 h-96 rounded-3xl bg-white shadow-xl p-4 border border-digirioh-100">
-                <div className="w-full h-8 bg-whatsapp flex items-center px-2 rounded-t-lg">
-                  <div className="h-3 w-3 rounded-full bg-white mr-2"></div>
-                  <span className="text-white text-xs font-medium">DigiRioh</span>
-                </div>
-                <div className="h-full overflow-hidden rounded-b-lg bg-whatsapp-light p-3">
-                  <div className="bg-white rounded-lg p-3 mb-3 inline-block max-w-[80%]">
-                    <p className="text-sm">Para conectar sua conta, envie o código: <strong>123456</strong></p>
-                  </div>
-                  <div className="bg-digirioh-100 rounded-lg p-3 mb-3 inline-block max-w-[80%] ml-auto">
-                    <p className="text-sm">123456</p>
-                  </div>
-                  <div className="bg-white rounded-lg p-3 mb-3 inline-block max-w-[80%]">
-                    <p className="text-sm">Conta conectada com sucesso! Agora você pode usar todas as funcionalidades do DigiRioh.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
       
       {/* Features Details */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-background">
         <div className="container">
-          <h2 className="text-3xl font-bold mb-12 text-center text-digirioh-800">Detalhes das Funcionalidades</h2>
+          <h2 className="text-3xl font-bold mb-12 text-center text-foreground">Detalhes das Funcionalidades</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <FeatureDetailCard 
@@ -173,7 +170,7 @@ export default function Features() {
             <Button 
               onClick={handleGoogleSignIn} 
               size="lg"
-              className="text-lg px-6 py-5 bg-digirioh-600 hover:bg-digirioh-700"
+              className="text-lg px-6 py-5 bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               Começar Agora com Google
             </Button>
@@ -240,14 +237,14 @@ function FeatureDetailCard({
   description: string;
 }) {
   return (
-    <div className="p-6 rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow">
+    <div className="p-8 rounded-2xl border feature-card border-border bg-card shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300">
       <div className="flex items-start gap-4">
-        <div className="p-3 rounded-full bg-digirioh-100 shrink-0">
-          <Icon className="h-6 w-6 text-digirioh-600" />
+        <div className="p-3 rounded-2xl bg-primary/10 shrink-0">
+          <Icon className="h-6 w-6 text-primary" />
         </div>
         <div>
-          <h3 className="text-xl font-semibold mb-2 text-digirioh-800">{title}</h3>
-          <p className="text-gray-600">{description}</p>
+          <h3 className="text-xl font-semibold mb-2 text-foreground">{title}</h3>
+          <p className="text-muted-foreground">{description}</p>
         </div>
       </div>
     </div>
