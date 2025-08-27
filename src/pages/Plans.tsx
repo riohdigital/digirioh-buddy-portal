@@ -96,6 +96,10 @@ export default function Plans() {
                 <h2 className="text-2xl font-bold mb-2 text-foreground">Plano Pro</h2>
                 <p className="text-muted-foreground">Para uso avançado</p>
                 <div className="mt-4">
+                  <div className="flex items-center justify-center gap-2 mb-1">
+                    <span className="text-lg text-muted-foreground line-through">De R$ 29,90</span>
+                    <span className="text-sm text-green-600 font-medium">por</span>
+                  </div>
                   <span className="text-4xl font-bold text-foreground">R$ 9,90</span>
                   <span className="text-muted-foreground">/mês</span>
                 </div>

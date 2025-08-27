@@ -7,7 +7,7 @@ import digiriohLogo from "@/assets/digirioh-logo.png";
 import digiriohLogoText from "@/assets/digirioh-logo-text.png";
 
 export function Navbar() {
-  const { user, signOut } = useAuth();
+  const { user, signOut, signInWithGoogle } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -21,6 +21,14 @@ export function Navbar() {
 
   const handleSignOut = async () => {
     await signOut();
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      console.error("Erro ao fazer login com Google:", error);
+    }
   };
 
   return (
@@ -41,7 +49,7 @@ export function Navbar() {
               <Link to="/plans" className="text-foreground hover:text-primary transition-colors font-medium hidden sm:block">
                 Planos
               </Link>
-              <Button variant="default" size="sm" className="bg-primary hover:bg-primary/90">
+              <Button variant="default" size="sm" className="bg-primary hover:bg-primary/90" onClick={handleGoogleSignIn}>
                 Entrar
               </Button>
             </>
